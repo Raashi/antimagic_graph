@@ -3,4 +3,5 @@ project(antimagic)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(antimagic main.cpp)
+file(GLOB CPPS "*.cpp")
+add_executable(antimagic ${CPPS})
