@@ -4,6 +4,7 @@
 #include <string>
 
 void print_perm(const int* perm, int n);
+void print_matrix(int** matrix, int n);
 
 int graph6_to_n(std::string & graph6);
 int** graph6_to_matrix(std::string & graph6);
