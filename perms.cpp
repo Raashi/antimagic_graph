@@ -3,45 +3,51 @@
 #include "perms.h"
 
 
-int* init_gen(PermGen& gen, const int n) {
-    gen.n = n;
-    gen.depth = n - 1;
-    gen.free = new int[n];
-    gen.perm = new int[n];
+PermGen::PermGen(int n) {
+    this->n = n;
+    this->depth = n - 1;
+    this->free = new int[n];
+    this->perm = new int[n];
     for (int i = 0; i < n; ++i) {
-        gen.free[i] = false;
-        gen.perm[i] = i;
+        this->free[i] = false;
+        this->perm[i] = i;
     }
-    return gen.perm;
+    this->start = true;
 }
 
-int* next(PermGen& gen) {
-    while (0 <= gen.depth && gen.depth < gen.n) {
-        if (gen.perm[gen.depth] >= 0)
-            gen.free[gen.perm[gen.depth]] = true;
-        gen.perm[gen.depth]++;
+
+int* PermGen::next() {
+    if (this->start) {
+        this->start = false;
+        return this->perm;
+    }
+
+    while (0 <= this->depth && this->depth < this->n) {
+        if (this->perm[this->depth] >= 0)
+            this->free[this->perm[this->depth]] = true;
+        this->perm[this->depth]++;
 
         bool go_up = false;
-        while (gen.perm[gen.depth] < gen.n) {
-            if (gen.free[gen.perm[gen.depth]]) {
-                gen.free[gen.perm[gen.depth]] = false;
-                gen.depth++;
+        while (this->perm[this->depth] < this->n) {
+            if (this->free[this->perm[this->depth]]) {
+                this->free[this->perm[this->depth]] = false;
+                this->depth++;
                 go_up = true;
                 break;
             }
-            gen.perm[gen.depth]++;
+            this->perm[this->depth]++;
         }
         if (!go_up) {
-            gen.perm[gen.depth] = -1;
-            gen.depth--;
+            this->perm[this->depth] = -1;
+            this->depth--;
         }
     }
-    if (gen.depth == gen.n) {
-        gen.depth--;
-        return gen.perm;
+    if (this->depth == this->n) {
+        this->depth--;
+        return this->perm;
     } else {
-        delete[] gen.perm;
-        delete[] gen.free;
+        delete[] this->perm;
+        delete[] this->free;
         return nullptr;
     }
 }

@@ -8,10 +8,10 @@ struct PermGen {
     int depth;
     int* free;
     int* perm;
+    bool start;
+
+    explicit PermGen(int n);
+    int* next();
 };
-
-int* init_gen(PermGen& gen, int n);
-
-int* next(PermGen& gen);
 
 #endif //ANTIMAGIC_PERMS_H

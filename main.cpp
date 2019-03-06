@@ -3,6 +3,7 @@
 
 #include "utils.h"
 #include "perms.h"
+#include "graph.h"
 
 
 int main() {
@@ -23,9 +24,12 @@ int main() {
     std::cout << "Enter graph6: ";
     std::string graph6;
     std::cin >> graph6;
-    int n = graph6_to_n(graph6);
-    int** matrix = graph6_to_matrix(graph6);
-    print_matrix(matrix, n);
 
+    Graph graph = from_graph6(graph6);
+    print_graph(graph);
+    std::cout << std::endl;
+    std::cout << is_antimagic(graph);
+
+    graph_free(graph);
     return 0;
 }
