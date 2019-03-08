@@ -23,6 +23,20 @@ bool Edge::operator<(const Edge &right) const {
         return this->a < right.a;
 }
 
+Graph::Graph(int n, Edges edges) {
+    this->n = n;
+    this->matrix = new int*[n];
+    for (int i = 0; i < n; ++i) {
+        this->matrix[i] = new int[n];
+        for (int j = 0; j < n; ++j)
+            this->matrix[i][j] = 0;
+    }
+    for (Edge edge: edges) {
+        this->matrix[edge.a][edge.b] = 1;
+        this->matrix[edge.b][edge.a] = 1;
+    }
+}
+
 Graph::Graph(std::string &graph6) {
     // initialization
     this->n = int(graph6[0]) - 63;
@@ -77,9 +91,33 @@ void Graph::display() {
     }
 }
 
+std::string Graph::to_graph6() {
+    std::string g6(1, char(this->n + 63));
+    int acc(0), bits(0);
+    for (int j = 0; j < this->n; ++j)
+        for (int i = 0; i < j; ++i) {
+            acc <<= 1;
+            acc += this->matrix[i][j];
+            bits++;
+            if (bits == 6) {
+                g6 += char(acc + 63);
+                acc = 0;
+                bits = 0;
+            }
+        }
+    if (bits > 0) {
+        acc <<= (6 - bits);
+        g6 += char(acc + 63);
+    }
+    for (char c: g6)
+        std::cout << int(c) << ' ';
+    std::cout << std::endl;
+    return g6;
+}
+
 bool Graph::is_antimagic() {
     Edges edges = this->get_edges();
-    PermGen gen = PermGen(int(edges.size()));
+    PermGen gen(int(edges.size()));
     int* perm = gen.next();
 
     while (perm != nullptr) {
@@ -88,23 +126,17 @@ bool Graph::is_antimagic() {
             phi[edges[i]] = perm[i] + 1;  // ro2(phi) = [1, 2, ..., edges_count]
 
         // calc sum of phi for every vertex
-        int* sums = new int[this->n];
-        for (int i = 0; i < this->n; ++i) {
-            int sum = 0;
+        std::vector<int> vec = std::vector<int>(this->n, 0);
+        for (int i = 0; i < this->n; ++i)
             for (int j = 0; j < this->n; ++j)
                 if (this->matrix[i][j])
-                    sum += phi[Edge(i, j)];
-            sums[i] = sum;
-        }
-        std::vector<int> vec = std::vector<int>();
-        for (int i = 0; i < this->n; ++i)
-            vec.push_back(sums[i]);
-        delete [] sums;
+                    vec[i] += phi[Edge(i, j)];
+
         // looking for duplicates
         std::sort(vec.begin(), vec.end());
         bool antimagic = true;
         for (int i = 0; i < this->n - 2; ++i)
-            if (sums[i] == sums[i + 1]) {
+            if (vec[i] == vec[i + 1]) {
                 antimagic = false;
                 break;
             }

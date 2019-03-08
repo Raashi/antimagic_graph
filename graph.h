@@ -19,10 +19,13 @@ struct Graph {
     int** matrix;
 
     explicit Graph(std::string& graph6);
+    Graph(int n, Edges edges);
     ~Graph();
 
     Edges get_edges();
     void display();
+    std::string to_graph6();
+
     bool is_antimagic();
 };
 

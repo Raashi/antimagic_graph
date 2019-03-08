@@ -45,11 +45,8 @@ int* PermGen::next() {
     if (this->depth == this->n) {
         this->depth--;
         return this->perm;
-    } else {
-        delete[] this->perm;
-        delete[] this->free;
+    } else
         return nullptr;
-    }
 }
 
 PermGen::~PermGen() {
