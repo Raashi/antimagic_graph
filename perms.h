@@ -12,6 +12,8 @@ struct PermGen {
 
     explicit PermGen(int n);
     int* next();
+
+    ~PermGen();
 };
 
 #endif //ANTIMAGIC_PERMS_H

@@ -3,11 +3,28 @@
 
 #include <string>
 
-#include "utils.h"
+
+struct Edge {
+    int a, b;
+
+    Edge(int a, int b);
+
+    bool operator < (const Edge& a) const;
+};
+typedef std::vector<Edge> Edges;
 
 
-Graph from_graph6(std::string & graph6);
-bool is_antimagic(Graph& graph);
+struct Graph {
+    int n;
+    int** matrix;
+
+    explicit Graph(std::string& graph6);
+    ~Graph();
+
+    Edges get_edges();
+    void display();
+    bool is_antimagic();
+};
 
 
 #endif //ANTIMAGIC_GRAPH_H

@@ -51,3 +51,8 @@ int* PermGen::next() {
         return nullptr;
     }
 }
+
+PermGen::~PermGen() {
+    delete [] this->free;
+    delete [] this->perm;
+}

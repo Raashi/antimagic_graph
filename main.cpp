@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 
-#include "utils.h"
 #include "perms.h"
 #include "graph.h"
 
@@ -21,15 +20,15 @@ int main() {
      */
     // DQc
 
-    std::cout << "Enter graph6: ";
-    std::string graph6;
-    std::cin >> graph6;
+    // std::cout << "Enter graph6: ";
+    std::string graph6 = "DQc";
+    // std::cin >> graph6;
 
-    Graph graph = from_graph6(graph6);
-    print_graph(graph);
+    Graph graph(graph6);
+    graph.display();
+
     std::cout << std::endl;
-    std::cout << is_antimagic(graph);
+    std::cout << graph.is_antimagic();
 
-    graph_free(graph);
     return 0;
 }
