@@ -1,7 +1,10 @@
-# Mac OS files
-.DS_Store
+# Project files
 .idea/
 cmake-build-debug/
+n*.txt
+
+# Mac OS files
+.DS_Store
 
 # Prerequisites
 *.d

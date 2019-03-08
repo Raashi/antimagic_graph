@@ -119,18 +119,20 @@ bool Graph::is_antimagic() {
     Edges edges = this->get_edges();
     PermGen gen(int(edges.size()));
     int* perm = gen.next();
+    std::map<Edge, int> phi = std::map<Edge, int>();
+    std::vector<int> vec = std::vector<int>(this->n, 0);
 
     while (perm != nullptr) {
-        std::map<Edge, int> phi = std::map<Edge, int>();
         for (int i = 0; i < edges.size(); ++i)
             phi[edges[i]] = perm[i] + 1;  // ro2(phi) = [1, 2, ..., edges_count]
 
         // calc sum of phi for every vertex
-        std::vector<int> vec = std::vector<int>(this->n, 0);
-        for (int i = 0; i < this->n; ++i)
+        for (int i = 0; i < this->n; ++i) {
+            vec[i] = 0;
             for (int j = 0; j < this->n; ++j)
                 if (this->matrix[i][j])
                     vec[i] += phi[Edge(i, j)];
+        }
 
         // looking for duplicates
         std::sort(vec.begin(), vec.end());

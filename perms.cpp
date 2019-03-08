@@ -1,4 +1,5 @@
 #include <vector>
+#include <iostream>
 
 #include "perms.h"
 
@@ -52,4 +53,9 @@ int* PermGen::next() {
 PermGen::~PermGen() {
     delete [] this->free;
     delete [] this->perm;
+}
+
+void PermGen::display_last() {
+    for (int i = 0; i < this->n; ++i)
+        printf("%i, ", this->perm[i]);
 }

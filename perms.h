@@ -14,6 +14,8 @@ struct PermGen {
     int* next();
 
     ~PermGen();
+
+    void display_last();
 };
 
 #endif //ANTIMAGIC_PERMS_H
