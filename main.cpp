@@ -43,9 +43,9 @@ void brute(FILE* fp) {
         int antimagic = g.is_antimagic();
 
         checked_count++;
-        if (antimagic == 0)
+        if (antimagic == NON_ANTIMAGIC)
             non_antimagic++;
-        else if (antimagic == -1) {
+        else if (antimagic == TIME_OVERFLOW) {
             unchecked.push_back(g6);
             skipped++;
         }

@@ -6,9 +6,14 @@
 
 typedef int Vertex;
 typedef std::vector<Vertex> Vertices;
+typedef std::vector<Vertices> VecVertices;
 
 
 const double MAX_ANTIMAGIC_CALCULATION_TIME = 1;
+
+const int TIME_OVERFLOW = -1;
+const int NON_ANTIMAGIC = 0;
+const int ANTIMAGIC = 1;
 
 
 struct Edge {
@@ -31,6 +36,7 @@ struct Graph {
 
     Edges get_edges();
     Vertices get_isolated();
+    VecVertices get_adj_list();
 
     void display();
 
