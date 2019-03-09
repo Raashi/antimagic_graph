@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <algorithm>
+#include <time.h>
 
 #include "perms.h"
 #include "graph.h"
@@ -83,6 +84,21 @@ Edges Graph::get_edges() {
     return edges;
 }
 
+Vertices Graph::get_isolated() {
+    Vertices vertices = Vertices();
+    for (int i = 0; i < this->n; ++i) {
+        bool isolated = true;
+        for (int j = 0; j < this->n; ++j)
+            if (this->matrix[i][j]) {
+                isolated = false;
+                break;
+            }
+        if (isolated)
+            vertices.push_back(i);
+    }
+    return vertices;
+}
+
 void Graph::display() {
     for (int i = 0; i < this->n; ++i) {
         for (int j = 0; j < this->n; ++j)
@@ -115,16 +131,24 @@ std::string Graph::to_graph6() {
     return g6;
 }
 
-bool Graph::is_antimagic() {
+int Graph::is_antimagic() {
+    // 1st optimization: isolated vertices count must be <= 1
+    if (this->get_isolated().size() > 1)
+        return 0;
+
     Edges edges = this->get_edges();
     PermGen gen(int(edges.size()));
     int* perm = gen.next();
     std::map<Edge, int> phi = std::map<Edge, int>();
     std::vector<int> vec = std::vector<int>(this->n, 0);
 
+    time_t start, current;
+    time(&start);
+    long long iteration = 0;
     while (perm != nullptr) {
+        iteration++;
         for (int i = 0; i < edges.size(); ++i)
-            phi[edges[i]] = perm[i] + 1;  // ro2(phi) = [1, 2, ..., edges_count]
+            phi[edges[i]] = perm[i] + 1;  // phi: E -> [1, 2, ..., edges_count]
 
         // calc sum of phi for every vertex
         for (int i = 0; i < this->n; ++i) {
@@ -145,10 +169,16 @@ bool Graph::is_antimagic() {
 
         // return true if antimagic phi was found
         if (antimagic)
-            return true;
+            return 1;
 
+        if (iteration % 10000 == 0) {
+            time(&current);
+            double elapsed = difftime(current, start);
+            if (elapsed > MAX_ANTIMAGIC_CALCULATION_TIME)
+                return -1;
+        }
         perm = gen.next();
     }
     // return false if antimagic phi was never found
-    return false;
+    return 0;
 }

@@ -4,6 +4,13 @@
 #include <string>
 
 
+typedef int Vertex;
+typedef std::vector<Vertex> Vertices;
+
+
+const double MAX_ANTIMAGIC_CALCULATION_TIME = 1;
+
+
 struct Edge {
     int a, b;
 
@@ -23,10 +30,13 @@ struct Graph {
     ~Graph();
 
     Edges get_edges();
+    Vertices get_isolated();
+
     void display();
+
     std::string to_graph6();
 
-    bool is_antimagic();
+    int is_antimagic();
 };
 
 

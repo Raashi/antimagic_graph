@@ -2,6 +2,7 @@
 #include <string>
 #include <stdexcept>
 #include <fstream>
+#include <iterator>
 
 #include "perms.h"
 #include "graph.h"
@@ -15,15 +16,23 @@ unsigned long handle_first_line(char* line) {
     return (unsigned long) index;
 }
 
+void write_unchecked(std::vector<std::string> unchecked) {
+    std::ofstream output_file("unchecked.txt");
+    std::ostream_iterator<std::string> output_iterator(output_file, "\n");
+    std::copy(unchecked.begin(), unchecked.end(), output_iterator);
+}
 
 void brute(FILE* fp) {
-    char* line = nullptr;
-    size_t len = 0;
-    std::vector<int> vec = std::vector<int>();
-    bool first = true;
+    char* line                = nullptr;
+    size_t len                = 0;
+    bool first                = true;
     unsigned long true_length = 0;
-    int checked_count = 0;
-    int non_antimagic = 0;
+    int checked_count         = 0;
+    int non_antimagic         = 0;
+    int skipped               = 0;
+    // write here those graphs, that were checking for time > MAX_ANTIMAGIC_CALCULATION_TIME
+    std::vector<std::string> unchecked = std::vector<std::string>();
+
     while ((getline(&line, &len, fp)) != -1) {
         if (first) {
             true_length = handle_first_line(line);
@@ -31,18 +40,25 @@ void brute(FILE* fp) {
         }
         std::string g6(line, true_length);
         Graph g(g6);
-        bool antimagic = g.is_antimagic();
+        int antimagic = g.is_antimagic();
 
         checked_count++;
-        if (!antimagic)
+        if (antimagic == 0)
             non_antimagic++;
+        else if (antimagic == -1) {
+            unchecked.push_back(g6);
+            skipped++;
+        }
 
-        printf("\r%i %i", checked_count, non_antimagic);
+        printf("\rChecked: %i Non-antimagic: %i Unchecked: %i", checked_count, non_antimagic, skipped);
         fflush(stdout);
     }
-    fclose(fp);
+
     if (line)
         free(line);
+
+    if (!unchecked.empty())
+        write_unchecked(unchecked);
 }
 
 
@@ -59,6 +75,7 @@ int main(int argc, char **argv) {
         if (fp == nullptr)
             throw 2;
         brute(fp);
+        fclose(fp);
     } else if (op == "g6") {
         if (argc == 2)
             throw 1;
