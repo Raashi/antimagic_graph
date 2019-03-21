@@ -3,6 +3,9 @@
 
 #include <vector>
 
+using namespace std;
+
+
 struct PermGen {
     int n;
     int depth;

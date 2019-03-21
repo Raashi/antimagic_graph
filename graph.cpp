@@ -6,6 +6,8 @@
 #include "perms.h"
 #include "graph.h"
 
+using namespace std;
+
 
 Edge::Edge(const int a, const int b) {
     if (a < b) {
@@ -38,7 +40,7 @@ Graph::Graph(int n, Edges edges) {
     }
 }
 
-Graph::Graph(std::string &graph6) {
+Graph::Graph(string &graph6) {
     // initialization
     this->n = int(graph6[0]) - 63;
     this->matrix = new int*[n];
@@ -66,7 +68,6 @@ Graph::Graph(std::string &graph6) {
                 return;
         }
     }
-    raise(6);
 }
 
 Graph::~Graph() {
@@ -111,13 +112,13 @@ Vertices Graph::get_isolated() {
 void Graph::display() {
     for (int i = 0; i < this->n; ++i) {
         for (int j = 0; j < this->n; ++j)
-            std::printf("%i ", this->matrix[i][j]);
-        std::printf("\n");
+            printf("%i ", this->matrix[i][j]);
+        printf("\n");
     }
 }
 
-std::string Graph::to_graph6() {
-    std::string g6(1, char(this->n + 63));
+string Graph::to_graph6() {
+    string g6(1, char(this->n + 63));
     int acc(0), bits(0);
     for (int j = 0; j < this->n; ++j)
         for (int i = 0; i < j; ++i) {
@@ -135,8 +136,8 @@ std::string Graph::to_graph6() {
         g6 += char(acc + 63);
     }
     for (char c: g6)
-        std::cout << int(c) << ' ';
-    std::cout << std::endl;
+        cout << int(c) << ' ';
+    cout << endl;
     return g6;
 }
 
@@ -154,8 +155,8 @@ int Graph::is_antimagic() {
     Edges edges = this->get_edges();
     PermGen gen(int(edges.size()));
     int* perm = gen.next();
-    std::map<Edge, int> phi = std::map<Edge, int>();
-    std::vector<int> vec = std::vector<int>(this->n, 0);
+    map<Edge, int> phi = map<Edge, int>();
+    vector<int> vec = vector<int>(this->n, 0);
 
     time_t start, current;
     time(&start);
@@ -174,7 +175,7 @@ int Graph::is_antimagic() {
         }
 
         // looking for duplicates
-        std::sort(vec.begin(), vec.end());
+        sort(vec.begin(), vec.end());
         bool antimagic = true;
         for (int i = 0; i < this->n - 2; ++i)
             if (vec[i] == vec[i + 1]) {

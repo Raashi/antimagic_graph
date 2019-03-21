@@ -3,6 +3,8 @@
 
 #include "perms.h"
 
+using namespace std;
+
 
 PermGen::PermGen(int n) {
     this->n = n;

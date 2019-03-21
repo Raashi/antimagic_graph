@@ -3,10 +3,12 @@
 
 #include <string>
 
+using namespace std;
+
 
 typedef int Vertex;
-typedef std::vector<Vertex> Vertices;
-typedef std::vector<Vertices> VecVertices;
+typedef vector<Vertex> Vertices;
+typedef vector<Vertices> VecVertices;
 
 
 const double MAX_ANTIMAGIC_CALCULATION_TIME = 1;
@@ -23,14 +25,14 @@ struct Edge {
 
     bool operator < (const Edge& a) const;
 };
-typedef std::vector<Edge> Edges;
+typedef vector<Edge> Edges;
 
 
 struct Graph {
     int n;
     int** matrix;
 
-    explicit Graph(std::string& graph6);
+    explicit Graph(string& graph6);
     Graph(int n, Edges edges);
     ~Graph();
 
@@ -40,7 +42,7 @@ struct Graph {
 
     void display();
 
-    std::string to_graph6();
+    string to_graph6();
 
     int is_antimagic();
 };

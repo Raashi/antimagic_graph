@@ -7,19 +7,21 @@
 #include "perms.h"
 #include "graph.h"
 
+using namespace std;
+
 
 unsigned long handle_first_line(char* line) {
     int index = 0;
-    std::string g6(line);
+    string g6(line);
     while ((int(g6[index])) >= 63)
         index++;
     return (unsigned long) index;
 }
 
-void write_unchecked(std::vector<std::string> unchecked) {
-    std::ofstream output_file("unchecked.txt");
-    std::ostream_iterator<std::string> output_iterator(output_file, "\n");
-    std::copy(unchecked.begin(), unchecked.end(), output_iterator);
+void write_unchecked(vector<string> unchecked) {
+    ofstream output_file("unchecked.txt");
+    ostream_iterator<string> output_iterator(output_file, "\n");
+    copy(unchecked.begin(), unchecked.end(), output_iterator);
 }
 
 void brute(FILE* fp) {
@@ -31,14 +33,14 @@ void brute(FILE* fp) {
     int non_antimagic         = 0;
     int skipped               = 0;
     // write here those graphs, that were checking for time > MAX_ANTIMAGIC_CALCULATION_TIME
-    std::vector<std::string> unchecked = std::vector<std::string>();
+    vector<string> unchecked = vector<string>();
 
     while ((getline(&line, &len, fp)) != -1) {
         if (first) {
             true_length = handle_first_line(line);
             first = false;
         }
-        std::string g6(line, true_length);
+        string g6(line, true_length);
         Graph g(g6);
         int antimagic = g.is_antimagic();
 
@@ -66,7 +68,7 @@ int main(int argc, char **argv) {
     if (argc < 2)
         throw -1;
 
-    std::string op = argv[1];
+    string op = argv[1];
     if (op == "brute") {
         if (argc < 3)
             throw 1;
@@ -80,24 +82,24 @@ int main(int argc, char **argv) {
         if (argc == 2)
             throw 1;
 
-        std::string op_g6 = argv[2];
+        string op_g6 = argv[2];
         if (op_g6 == "to") {
             int n, m;
-            std::cout << "Enter number of vertices (n) and number of edges (m):\n";
-            std::cin >> n >> m;
+            cout << "Enter number of vertices (n) and number of edges (m):\n";
+            cin >> n >> m;
             Edges edges;
-            std::cout << "Enter m edges:\n";
+            cout << "Enter m edges:\n";
             for (int i = 0; i < m; ++i) {
                 int a, b;
-                std::cin >> a >> b;
+                cin >> a >> b;
                 edges.emplace_back(a - 1, b - 1);
             }
-            std::cout << Graph(n, edges).to_graph6() << std::endl;
+            cout << Graph(n, edges).to_graph6() << endl;
 
         } else if (op_g6 == "from") {
-            std::string graph6;
-            std::cout << "Enter graph in graph6 format: ";
-            std::cin >> graph6;
+            string graph6;
+            cout << "Enter graph in graph6 format: ";
+            cin >> graph6;
             Graph(graph6).display();
         } else
             throw 1;
