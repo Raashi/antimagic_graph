@@ -54,9 +54,10 @@ void brute(FILE* fp) {
             skipped++;
         }
 
-        printf("\rChecked: %i Non-antimagic: %i Unchecked: %i\n", checked_count, non_antimagic, skipped);
+        printf("\rChecked: %i Non-antimagic: %i Unchecked: %i", checked_count, non_antimagic, skipped);
         fflush(stdout);
     }
+    cout << endl;
 
     if (line)
         free(line);
