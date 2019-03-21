@@ -3,6 +3,7 @@
 cmake-build-debug/
 n*.txt
 geng*
+antimagic*
 
 # Mac OS files
 .DS_Store
