@@ -3,7 +3,7 @@ project(antimagic)
 
 set(CMAKE_CXX_STANDARD 14)
 
-file(GLOB CPPS "*.cpp")
+file(GLOB CPPS "src/*.cpp")
 add_executable(antimagic ${CPPS})
 add_custom_command(TARGET antimagic
         POST_BUILD
