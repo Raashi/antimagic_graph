@@ -1,6 +1,8 @@
 #ifndef ANTIMAGIC_BRUTE_H
 #define ANTIMAGIC_BRUTE_H
 
-void brute(FILE* fp);
+#include <fstream>
+
+void brute(ifstream* fp);
 
 #endif //ANTIMAGIC_BRUTE_H

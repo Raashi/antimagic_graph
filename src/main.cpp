@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <fstream>
 
 #include "perms.h"
 #include "graph.h"
@@ -32,7 +33,7 @@ int main(int argc, char **argv) {
     string op = argv[1];
     switch (opts[op]) {
         case BRUTE: _brute(argc, argv);
-        case G6: _g6(argc, argv);
+        case    G6: _g6(argc, argv);
         default: break;
     }
 
@@ -43,10 +44,9 @@ void _brute(int argc, char **argv) {
     if (argc < 3)
         throw 1;
 
-    FILE* fp = fopen(argv[2], "r");
-    if (fp == nullptr) throw 2;
-    brute(fp);
-    fclose(fp);
+    ifstream file(argv[2]);
+    brute(&file);
+    file.close();
 }
 
 void _g6(int argc, char **argv) {
@@ -55,9 +55,9 @@ void _g6(int argc, char **argv) {
 
     string op = argv[2];
     switch (opts[op]) {
-        case G6_TO: _g6_to();
+        case   G6_TO: _g6_to();
         case G6_FROM: _g6_from(argc, argv);
-        default: break;
+        default     : break;
     }
 }
 
