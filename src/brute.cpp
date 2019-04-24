@@ -29,6 +29,7 @@ struct BruteParams {
     CRITICAL_SECTION cs_print{};
 
     ifstream* fp;
+    ulong thread_count;
 
     explicit BruteParams (int argc, char** argv, ifstream* fp) {
         InitializeCriticalSection(&this->cs);
@@ -37,33 +38,40 @@ struct BruteParams {
 
         this->fp = fp;
 
+        this->thread_count = get_arg(argc, argv, "-tc", THREAD_COUNT_DEFAULT);
+        cout << SYS_MSG << "Launching " << thread_count << " threads" << endl;
+
         this->skip = has_arg(argc, argv, "-skip");
         this->skip_time = get_arg(argc, argv, "-skt", MAX_ANTIMAGIC_CALCULATION_TIME);
         this->vec_skipped = vector<string>();
+
+        if (this->skip)
+            cout << SYS_MSG << "Maximum time for calculating graph was set to "
+                 << this->skip_time << " seconds" << endl;
     };
+
+    void print_stat(bool same_line) {
+        if (this->skip)
+            printf("\rChecked: %i Non-antimagic: %i Skipped: %i%s",
+                   (int) this->checked,
+                   (int) this->non_antimagic,
+                   (int) this->skipped,
+                   same_line ? "" : "\n");
+        else
+            printf("\rChecked: %i Non-antimagic: %i%s",
+                   (int) this->checked,
+                   (int) this->non_antimagic,
+                   same_line ? "" : "\n");
+    };
+
+    void write_skipped() {
+        if (!skip || this->vec_skipped.empty())
+            return;
+        ofstream output_file("skipped.txt");
+        ostream_iterator<string> output_iterator(output_file, "\n");
+        copy(this->vec_skipped.begin(), this->vec_skipped.end(), output_iterator);
+    }
 };
-
-
-void print_stat(BruteParams* bp, bool same_line) {
-    if (bp->skip)
-        printf("\rChecked: %i Non-antimagic: %i Unchecked: %i%s",
-                (int) bp->checked,
-                (int) bp->non_antimagic,
-                (int) bp->skipped,
-                same_line ? "" : "\n");
-    else
-        printf("\rChecked: %i Non-antimagic: %i%s",
-                (int) bp->checked,
-                (int) bp->non_antimagic,
-                same_line ? "" : "\n");
-}
-
-
-void write_unchecked(vector<string> unchecked) {
-    ofstream output_file("skipped.txt");
-    ostream_iterator<string> output_iterator(output_file, "\n");
-    copy(unchecked.begin(), unchecked.end(), output_iterator);
-}
 
 
 unsigned int __stdcall brute_worker(void * param) {
@@ -94,7 +102,7 @@ unsigned int __stdcall brute_worker(void * param) {
 
         if (bp->checked % 10 == 0) {
             EnterCriticalSection(&bp->cs_print);
-            print_stat(bp, true);
+            bp->print_stat(true);
             fflush(stdout);
             LeaveCriticalSection(&bp->cs_print);
         }
@@ -108,21 +116,19 @@ void brute(int argc, char** argv, ifstream* fp) {
     time_t start, end;
     time(&start);
 
-    DWORD thread_count = get_arg(argc, argv, "-tc", THREAD_COUNT_DEFAULT);
-    cout << SYS_MSG << "Launching " << thread_count << " threads" << endl;
-    HANDLE threads[thread_count];
-    for (int i = 0; i < thread_count; ++i) {
+
+    HANDLE threads[bp.thread_count];
+    for (int i = 0; i < bp.thread_count; ++i) {
         auto thread = (HANDLE) _beginthreadex(nullptr, 0, &brute_worker, (void*) &bp, 0, nullptr);
         threads[i] = thread;
     }
 
-    WaitForMultipleObjects(thread_count, threads, true, INFINITE);
+    WaitForMultipleObjects(bp.thread_count, threads, true, INFINITE);
 
-    print_stat(&bp, false);
+    bp.print_stat(false);
     time(&end);
     double elapsed = difftime(end, start);
     cout << "Elapsed time: " << elapsed / 60 << " minutes" << endl;
 
-    if (!bp.vec_skipped.empty())
-        write_unchecked(bp.vec_skipped);
+    bp.write_skipped();
 }

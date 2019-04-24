@@ -13,9 +13,11 @@ int string_to_int(string & value) {
     return stoi(value);
 }
 
+
 double string_to_double(string & value) {
     return atof(value.c_str()); // NOLINT(cert-err34-c)
 }
+
 
 bool has_arg(int argc, char **argv, string arg) {
     for (int i = 0; i < argc; ++i) {
@@ -25,6 +27,7 @@ bool has_arg(int argc, char **argv, string arg) {
     }
     return false;
 }
+
 
 string get_arg(int argc, char **argv, string arg, string def) {
     for (int i = 0; i < argc; ++i) {
@@ -39,6 +42,7 @@ string get_arg(int argc, char **argv, string arg, string def) {
     return def;
 }
 
+
 int get_arg(int argc, char **argv, string arg, int def) {
     string value = get_arg(argc, argv, arg, "");
     if (value.empty())
@@ -52,10 +56,12 @@ int get_arg(int argc, char **argv, string arg, int def) {
     }
 }
 
-DWORD get_arg(int argc, char **argv, string arg, DWORD def) {
+
+ulong get_arg(int argc, char **argv, string arg, ulong def) {
     int res = get_arg(argc, argv, arg, int(def)); // NOLINT(performance-unnecessary-value-param)
-    return DWORD(res);
+    return ulong(res);
 }
+
 
 double get_arg(int argc, char **argv, string arg, double def) {
     string value = get_arg(argc, argv, arg, ""); // NOLINT(performance-unnecessary-value-param)
