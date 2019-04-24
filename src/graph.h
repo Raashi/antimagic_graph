@@ -44,7 +44,7 @@ struct Graph {
 
     string to_graph6();
 
-    int is_antimagic();
+    int is_antimagic(bool skip, double time_overflow);
 };
 
 

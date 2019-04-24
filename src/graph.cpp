@@ -141,7 +141,7 @@ string Graph::to_graph6() {
     return g6;
 }
 
-int Graph::is_antimagic() {
+int Graph::is_antimagic(bool skip, double time_overflow) {
     // 1st optimization: isolated vertices count must be <= 1
     if (this->get_isolated().size() > 1)
         return NON_ANTIMAGIC;
@@ -188,12 +188,12 @@ int Graph::is_antimagic() {
             return ANTIMAGIC;
 
         // time optimization
-        if (iteration % 1000 == 0) {
-            time(&current);
-            double elapsed = difftime(current, start);
-            if (elapsed > MAX_ANTIMAGIC_CALCULATION_TIME)
-                return TIME_OVERFLOW;
-        }
+        if (skip && iteration % 1000 == 0) {
+                time(&current);
+                double elapsed = difftime(current, start);
+                if (elapsed > time_overflow)
+                    return TIME_OVERFLOW;
+            }
         perm = gen.next();
     }
     // return false if antimagic phi was never found
