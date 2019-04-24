@@ -24,29 +24,33 @@ struct BruteParams {
     atomic_int skipped{0};
     vector<string> vec_skipped;
 
+#ifdef _WIN32
     CRITICAL_SECTION cs{};
     CRITICAL_SECTION cs_skipped{};
     CRITICAL_SECTION cs_print{};
+#endif
 
     ifstream* fp;
     ulong thread_count;
 
     explicit BruteParams (int argc, char** argv, ifstream* fp) {
+#ifdef _WIN32
         InitializeCriticalSection(&this->cs);
         InitializeCriticalSection(&this->cs_skipped);
         InitializeCriticalSection(&this->cs_print);
+#endif
 
         this->fp = fp;
 
         this->thread_count = get_arg(argc, argv, "-tc", THREAD_COUNT_DEFAULT);
-        cout << SYS_MSG << "Launching " << thread_count << " threads" << endl;
+        cout << SYS_MSG << "Thread count set to " << thread_count << endl;
 
         this->skip = has_arg(argc, argv, "-skip");
         this->skip_time = get_arg(argc, argv, "-skt", MAX_ANTIMAGIC_CALCULATION_TIME);
         this->vec_skipped = vector<string>();
 
         if (this->skip)
-            cout << SYS_MSG << "Maximum time for calculating graph was set to "
+            cout << SYS_MSG << "Maximum time for calculating graph set to "
                  << this->skip_time << " seconds" << endl;
     };
 
@@ -79,6 +83,7 @@ unsigned int __stdcall brute_worker(void * param) {
     string line;
 
     do {
+#ifdef _WIN32
         bool leave = false;
         EnterCriticalSection(&bp->cs);
         if (not (bool) getline(*(bp->fp), line))
@@ -86,6 +91,7 @@ unsigned int __stdcall brute_worker(void * param) {
         LeaveCriticalSection(&bp->cs);
 
         if (leave) _endthreadex(0);
+#endif
 
         Graph g(line);
         int antimagic = g.is_antimagic(bp->skip, bp->skip_time);
@@ -94,17 +100,25 @@ unsigned int __stdcall brute_worker(void * param) {
         if (antimagic == NON_ANTIMAGIC)
             bp->non_antimagic++;
         else if (antimagic == TIME_OVERFLOW) {
+#ifdef _WIN32
             EnterCriticalSection(&bp->cs_skipped);
+#endif
             bp->vec_skipped.push_back(line);
+#ifdef _WIN32
             LeaveCriticalSection(&bp->cs_skipped);
+#endif
             bp->skipped++;
         }
 
         if (bp->checked % 10 == 0) {
+#ifdef _WIN32
             EnterCriticalSection(&bp->cs_print);
+#endif
             bp->print_stat(true);
             fflush(stdout);
+#ifdef _WIN32
             LeaveCriticalSection(&bp->cs_print);
+#endif
         }
     } while (true);
 }
@@ -116,7 +130,8 @@ void brute(int argc, char** argv, ifstream* fp) {
     time_t start, end;
     time(&start);
 
-
+#ifdef _WIN32
+    cout << SYS_MSG << "Launching windows threads..." << endl;
     HANDLE threads[bp.thread_count];
     for (int i = 0; i < bp.thread_count; ++i) {
         auto thread = (HANDLE) _beginthreadex(nullptr, 0, &brute_worker, (void*) &bp, 0, nullptr);
@@ -124,6 +139,9 @@ void brute(int argc, char** argv, ifstream* fp) {
     }
 
     WaitForMultipleObjects(bp.thread_count, threads, true, INFINITE);
+#else
+    brute_worker(&bp);
+#endif
 
     bp.print_stat(false);
     time(&end);
