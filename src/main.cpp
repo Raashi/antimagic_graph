@@ -13,6 +13,7 @@ const int BRUTE = 0;
 const int G6 = 1;
 const int G6_TO = 2;
 const int G6_FROM = 3;
+
 map<string, int> opts = { // NOLINT(cert-err58-cpp)
         {"brute", BRUTE},
         {"g6", G6},
@@ -32,9 +33,9 @@ int main(int argc, char **argv) {
 
     string op = argv[1];
     switch (opts[op]) {
-        case BRUTE: _brute(argc, argv);
-        case    G6: _g6(argc, argv);
-        default: break;
+        case    BRUTE: _brute(argc, argv);
+        case       G6: _g6(argc, argv);
+        default      : break;
     }
 
     return 0;
@@ -45,7 +46,7 @@ void _brute(int argc, char **argv) {
         throw 1;
 
     ifstream file(argv[2]);
-    brute(&file);
+    brute(argc, argv, &file);
     file.close();
 }
 
@@ -55,9 +56,9 @@ void _g6(int argc, char **argv) {
 
     string op = argv[2];
     switch (opts[op]) {
-        case   G6_TO: _g6_to();
-        case G6_FROM: _g6_from(argc, argv);
-        default     : break;
+        case      G6_TO: _g6_to();
+        case    G6_FROM: _g6_from(argc, argv);
+        default        : break;
     }
 }
 

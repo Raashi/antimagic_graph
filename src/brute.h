@@ -2,7 +2,10 @@
 #define ANTIMAGIC_BRUTE_H
 
 #include <fstream>
+#include <windows.h>
 
-void brute(ifstream* fp);
+const DWORD THREAD_COUNT_DEFAULT = 4;
+
+void brute(int argc, char** argv, ifstream* fp);
 
 #endif //ANTIMAGIC_BRUTE_H

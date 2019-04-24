@@ -10,11 +10,9 @@
 
 #include "graph.h"
 #include "brute.h"
+#include "utils.h"
 
 using namespace std;
-
-
-typedef unsigned long ulong;
 
 
 struct BruteParams {
@@ -90,13 +88,14 @@ unsigned int __stdcall brute_worker(void * param) {
 }
 
 
-void brute(ifstream* fp) {
+void brute(int argc, char** argv, ifstream* fp) {
     BruteParams bp(fp);
 
     time_t start, end;
     time(&start);
 
-    DWORD thread_count = 4;
+    DWORD thread_count = get_arg(argc, argv, "-tc", THREAD_COUNT_DEFAULT);
+    cout << SYS_MSG << "Launching " << thread_count << " threads" << endl;
     HANDLE threads[thread_count];
     for (int i = 0; i < thread_count; ++i) {
         auto thread = (HANDLE) _beginthreadex(nullptr, 0, &brute_worker, (void*) &bp, 0, nullptr);
