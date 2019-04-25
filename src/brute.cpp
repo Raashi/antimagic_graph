@@ -4,6 +4,7 @@
 #include <iterator>
 #include <fstream>
 #include <atomic>
+#include <time.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +12,8 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <process.h>
-#include <time.h>
+#else
+#include <pthread.h>
 #endif
 
 
@@ -35,6 +37,10 @@ struct BruteParams {
     CRITICAL_SECTION cs{};
     CRITICAL_SECTION cs_skipped{};
     CRITICAL_SECTION cs_print{};
+#else
+    pthread_mutex_t cs;
+    pthread_mutex_t cs_skipped;
+    pthread_mutex_t cs_print;
 #endif
 
     ifstream* fp;
@@ -45,6 +51,10 @@ struct BruteParams {
         InitializeCriticalSection(&this->cs);
         InitializeCriticalSection(&this->cs_skipped);
         InitializeCriticalSection(&this->cs_print);
+#else
+        pthread_mutex_init(&this->cs, nullptr);
+        pthread_mutex_init(&this->cs_skipped, nullptr);
+        pthread_mutex_init(&this->cs_print, nullptr);
 #endif
 
         this->fp = fp;
@@ -59,6 +69,16 @@ struct BruteParams {
         if (this->skip)
             cout << SYS_MSG << "Maximum time for calculating graph set to "
                  << this->skip_time << " seconds" << endl;
+    };
+
+    ~BruteParams() {
+#ifdef _WIN32
+
+#else
+    pthread_mutex_destroy(&this->cs);
+    pthread_mutex_destroy(&this->cs_skipped);
+    pthread_mutex_destroy(&this->cs_print);
+#endif
     };
 
     void print_stat(bool same_line) {
@@ -84,23 +104,29 @@ struct BruteParams {
     }
 };
 
-
+#ifdef _WIN32
 unsigned int __stdcall brute_worker(void * param) {
+#else
+void* brute_worker(void * param) {
+#endif
     auto * bp = (BruteParams*) param;
     string line;
 
     do {
-#ifdef _WIN32
         bool leave = false;
+#ifdef _WIN32
         EnterCriticalSection(&bp->cs);
+#else
+        pthread_mutex_lock(&bp->cs);
+#endif
         if (not (bool) getline(*(bp->fp), line))
             leave = true;
+#ifdef _WIN32
         LeaveCriticalSection(&bp->cs);
-
         if (leave) _endthreadex(0);
 #else
-        if (not (bool) getline(*(bp->fp), line))
-            return 0;
+        pthread_mutex_unlock(&bp->cs);
+        if (leave) pthread_exit(nullptr);
 #endif
 
         Graph g(line);
@@ -112,10 +138,14 @@ unsigned int __stdcall brute_worker(void * param) {
         else if (antimagic == TIME_OVERFLOW) {
 #ifdef _WIN32
             EnterCriticalSection(&bp->cs_skipped);
+#else
+            pthread_mutex_lock(&bp->cs_skipped);
 #endif
             bp->vec_skipped.push_back(line);
 #ifdef _WIN32
             LeaveCriticalSection(&bp->cs_skipped);
+#else
+            pthread_mutex_unlock(&bp->cs_skipped);
 #endif
             bp->skipped++;
         }
@@ -123,11 +153,15 @@ unsigned int __stdcall brute_worker(void * param) {
         if (bp->checked % 10 == 0) {
 #ifdef _WIN32
             EnterCriticalSection(&bp->cs_print);
+#else
+            pthread_mutex_lock(&bp->cs_print);
 #endif
             bp->print_stat(true);
             fflush(stdout);
 #ifdef _WIN32
             LeaveCriticalSection(&bp->cs_print);
+#else
+            pthread_mutex_unlock(&bp->cs_print);
 #endif
         }
     } while (true);
@@ -137,10 +171,8 @@ unsigned int __stdcall brute_worker(void * param) {
 void brute(int argc, char** argv, ifstream* fp) {
     BruteParams bp(argc, argv, fp);
 
-#ifdef _WIN32
     time_t start, end;
     time(&start);
-#endif
 
 #ifdef _WIN32
     cout << SYS_MSG << "Launching windows threads..." << endl;
@@ -152,15 +184,24 @@ void brute(int argc, char** argv, ifstream* fp) {
 
     WaitForMultipleObjects(bp.thread_count, threads, true, INFINITE);
 #else
-    brute_worker(&bp);
-#endif
+    cout << SYS_MSG << "Launching POSIX threads..." << endl;
+    pthread_t threads[bp.thread_count];
+    pthread_attr_t attrs[bp.thread_count];
 
+    for (int i = 0; i < bp.thread_count; ++i) {
+        pthread_attr_init(&attrs[i]);
+        pthread_create(&threads[i], &attrs[i], brute_worker, (void *) &bp);
+    }
+
+    for (int i = 0; i < bp.thread_count; ++i) {
+        pthread_join(threads[i], nullptr);
+    }
+#endif
     bp.print_stat(false);
-#ifdef _WIN32
+
     time(&end);
     double elapsed = difftime(end, start);
     cout << "Elapsed time: " << elapsed / 60 << " minutes" << endl;
-#endif
 
     bp.write_skipped();
 }
