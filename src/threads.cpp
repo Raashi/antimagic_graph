@@ -1,8 +1,10 @@
 #include <iostream>
 #include <time.h>
+#include <iterator>
 
 #ifdef _WIN32
 #include <windows.h>
+#include <process.h>
 #else
 #include <pthread.h>
 #endif
@@ -20,7 +22,7 @@ Mutex::Mutex() {
 
 Mutex::~Mutex() {
 #ifdef _WIN32
-    DeleteCriticalSection(this->cs);
+    DeleteCriticalSection(&this->cs);
 #else
     pthread_mutex_destroy(&this->mutex);
 #endif
@@ -44,7 +46,7 @@ void Mutex::unlock() {
 
 void exit_thread(int ret_val) {
 #ifdef _WIN32
-    _endthreadex(new int(ret_val));
+    _endthreadex(ret_val);
 #else
     pthread_exit(new int(ret_val));
 #endif
@@ -98,7 +100,7 @@ uint main_worker(void* arg) {
 
 #ifdef _WIN32
 uint __stdcall windows_worker(void* arg) {
-    return new int(main_worker(arg));
+    return main_worker(arg);
 }
 #else
 void* posix_worker(void* arg) {
@@ -114,13 +116,13 @@ void ThreadPull::run(worker_t worker, void* arg, worker_final_t worker_final) {
 
 #ifdef _WIN32
     cout << SYS_MSG << "Launching windows threads..." << endl;
-    HANDLE threads[bp.thread_count];
-    for (int i = 0; i < bp.thread_count; ++i) {
-        auto thread = (HANDLE) _beginthreadex(nullptr, 0, &brute_worker, (void*) &bp, 0, nullptr);
+    HANDLE threads[this->thread_count];
+    for (int i = 0; i < this->thread_count; ++i) {
+        auto thread = (HANDLE) _beginthreadex(nullptr, 0, windows_worker, (void*) &worker_arg, 0, nullptr);
         threads[i] = thread;
     }
 
-    WaitForMultipleObjects(bp.thread_count, threads, true, INFINITE);
+    WaitForMultipleObjects(this->thread_count, threads, true, INFINITE);
 #else
     cout << SYS_MSG << "Launching POSIX threads..." << endl;
     pthread_t threads[this->thread_count];
