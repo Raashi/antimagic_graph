@@ -20,6 +20,7 @@
 #include "graph.h"
 #include "brute.h"
 #include "utils.h"
+#include "threads.h"
 
 using namespace std;
 
@@ -33,30 +34,14 @@ struct BruteParams {
     atomic_int skipped{0};
     vector<string> vec_skipped;
 
-#ifdef _WIN32
-    CRITICAL_SECTION cs{};
-    CRITICAL_SECTION cs_skipped{};
-    CRITICAL_SECTION cs_print{};
-#else
-    pthread_mutex_t cs;
-    pthread_mutex_t cs_skipped;
-    pthread_mutex_t cs_print;
-#endif
+    Mutex mutex;
+    Mutex mutex_skipped;
+    Mutex mutex_print;
 
     ifstream* fp;
     ulong thread_count;
 
-    explicit BruteParams (int argc, char** argv, ifstream* fp) {
-#ifdef _WIN32
-        InitializeCriticalSection(&this->cs);
-        InitializeCriticalSection(&this->cs_skipped);
-        InitializeCriticalSection(&this->cs_print);
-#else
-        pthread_mutex_init(&this->cs, nullptr);
-        pthread_mutex_init(&this->cs_skipped, nullptr);
-        pthread_mutex_init(&this->cs_print, nullptr);
-#endif
-
+    BruteParams (int argc, char** argv, ifstream* fp) {
         this->fp = fp;
 
         this->thread_count = get_arg(argc, argv, "-tc", THREAD_COUNT_DEFAULT);
@@ -69,16 +54,6 @@ struct BruteParams {
         if (this->skip)
             cout << SYS_MSG << "Maximum time for calculating graph set to "
                  << this->skip_time << " seconds" << endl;
-    };
-
-    ~BruteParams() {
-#ifdef _WIN32
-
-#else
-    pthread_mutex_destroy(&this->cs);
-    pthread_mutex_destroy(&this->cs_skipped);
-    pthread_mutex_destroy(&this->cs_print);
-#endif
     };
 
     void print_stat(bool same_line) {
@@ -114,19 +89,15 @@ void* brute_worker(void * param) {
 
     do {
         bool leave = false;
-#ifdef _WIN32
-        EnterCriticalSection(&bp->cs);
-#else
-        pthread_mutex_lock(&bp->cs);
-#endif
+        bp->mutex.lock();
         if (not (bool) getline(*(bp->fp), line))
             leave = true;
+        bp->mutex.unlock();
+        if (leave)
 #ifdef _WIN32
-        LeaveCriticalSection(&bp->cs);
-        if (leave) _endthreadex(0);
+            _endthreadex(0);
 #else
-        pthread_mutex_unlock(&bp->cs);
-        if (leave) pthread_exit(nullptr);
+            pthread_exit(nullptr);
 #endif
 
         Graph g(line);
@@ -136,33 +107,17 @@ void* brute_worker(void * param) {
         if (antimagic == NON_ANTIMAGIC)
             bp->non_antimagic++;
         else if (antimagic == TIME_OVERFLOW) {
-#ifdef _WIN32
-            EnterCriticalSection(&bp->cs_skipped);
-#else
-            pthread_mutex_lock(&bp->cs_skipped);
-#endif
+            bp->mutex_skipped.lock();
             bp->vec_skipped.push_back(line);
-#ifdef _WIN32
-            LeaveCriticalSection(&bp->cs_skipped);
-#else
-            pthread_mutex_unlock(&bp->cs_skipped);
-#endif
+            bp->mutex_skipped.unlock();
             bp->skipped++;
         }
 
         if (bp->checked % 10 == 0) {
-#ifdef _WIN32
-            EnterCriticalSection(&bp->cs_print);
-#else
-            pthread_mutex_lock(&bp->cs_print);
-#endif
+            bp->mutex_print.lock();
             bp->print_stat(true);
             fflush(stdout);
-#ifdef _WIN32
-            LeaveCriticalSection(&bp->cs_print);
-#else
-            pthread_mutex_unlock(&bp->cs_print);
-#endif
+            bp->mutex_print.unlock();
         }
     } while (true);
 }
