@@ -5,6 +5,7 @@
 
 #include "perms.h"
 #include "graph.h"
+#include "threads.h"
 #include "brute.h"
 
 using namespace std;
@@ -46,7 +47,10 @@ void _brute(int argc, char **argv) {
         throw 1;
 
     ifstream file(argv[2]);
-    brute(argc, argv, &file);
+
+    ThreadPull tp{argc, argv, &file};
+    AntimagicBruteParams abp;
+    tp.run(worker_antimagic, (void*) &abp, worker_antimagic_finalize);
     file.close();
 }
 

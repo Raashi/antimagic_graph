@@ -141,16 +141,16 @@ string Graph::to_graph6() {
     return g6;
 }
 
-int Graph::is_antimagic(bool skip, double time_overflow) {
+uint Graph::is_antimagic(bool skip, double time_overflow) {
     // 1st optimization: isolated vertices count must be <= 1
     if (this->get_isolated().size() > 1)
-        return NON_ANTIMAGIC;
+        return ANTIMAGIC_NO;
     // 2nd optimization: if there is K2 connected component in G
     VecVertices adj = this->get_adj_list();
     for (int i = 0; i < this->n; ++i)
         if (adj[i].size() == 1)
             if (adj[adj[i][0]].size() == 1 && adj[adj[i][0]][0] == i)
-                return NON_ANTIMAGIC;
+                return ANTIMAGIC_NO;
 
     Edges edges = this->get_edges();
     PermGen gen(int(edges.size()));
@@ -185,17 +185,17 @@ int Graph::is_antimagic(bool skip, double time_overflow) {
 
         // return true if antimagic phi was found
         if (antimagic)
-            return ANTIMAGIC;
+            return ANTIMAGIC_YES;
 
         // time optimization
         if (skip && iteration % 1000 == 0) {
                 time(&current);
                 double elapsed = difftime(current, start);
                 if (elapsed > time_overflow)
-                    return TIME_OVERFLOW;
+                    return ANTIMAGIC_SKIPPED;
             }
         perm = gen.next();
     }
     // return false if antimagic phi was never found
-    return NON_ANTIMAGIC;
+    return ANTIMAGIC_NO;
 }

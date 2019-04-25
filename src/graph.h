@@ -11,11 +11,9 @@ typedef vector<Vertex> Vertices;
 typedef vector<Vertices> VecVertices;
 
 
-const double MAX_ANTIMAGIC_CALCULATION_TIME = 1;
-
-const int TIME_OVERFLOW = -1;
-const int NON_ANTIMAGIC = 0;
-const int ANTIMAGIC = 1;
+const uint ANTIMAGIC_YES = 1;
+const uint ANTIMAGIC_NO = 0;
+const uint ANTIMAGIC_SKIPPED = 2;
 
 
 struct Edge {
@@ -44,7 +42,7 @@ struct Graph {
 
     string to_graph6();
 
-    int is_antimagic(bool skip, double time_overflow);
+    uint is_antimagic(bool skip, double time_overflow);
 };
 
 
