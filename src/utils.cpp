@@ -1,7 +1,6 @@
 #include <sstream>
 #include <exception>
 #include <string>
-#include <windows.h>
 #include <stdlib.h>
 
 #include "utils.h"

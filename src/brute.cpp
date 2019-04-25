@@ -4,9 +4,16 @@
 #include <iterator>
 #include <fstream>
 #include <atomic>
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef _WIN32
 #include <windows.h>
 #include <process.h>
 #include <time.h>
+#endif
+
 
 #include "graph.h"
 #include "brute.h"
@@ -91,6 +98,9 @@ unsigned int __stdcall brute_worker(void * param) {
         LeaveCriticalSection(&bp->cs);
 
         if (leave) _endthreadex(0);
+#else
+        if (not (bool) getline(*(bp->fp), line))
+            return 0;
 #endif
 
         Graph g(line);
@@ -127,8 +137,10 @@ unsigned int __stdcall brute_worker(void * param) {
 void brute(int argc, char** argv, ifstream* fp) {
     BruteParams bp(argc, argv, fp);
 
+#ifdef _WIN32
     time_t start, end;
     time(&start);
+#endif
 
 #ifdef _WIN32
     cout << SYS_MSG << "Launching windows threads..." << endl;
@@ -144,9 +156,11 @@ void brute(int argc, char** argv, ifstream* fp) {
 #endif
 
     bp.print_stat(false);
+#ifdef _WIN32
     time(&end);
     double elapsed = difftime(end, start);
     cout << "Elapsed time: " << elapsed / 60 << " minutes" << endl;
+#endif
 
     bp.write_skipped();
 }

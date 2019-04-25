@@ -2,7 +2,6 @@
 #define ANTIMAGIC_BRUTE_H
 
 #include <fstream>
-#include <windows.h>
 
 #include "utils.h"
 

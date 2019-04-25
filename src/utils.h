@@ -2,7 +2,6 @@
 #define ANTIMAGIC_UTILS_H
 
 #include <string>
-#include <windows.h>
 
 using namespace std;
 
