@@ -22,6 +22,7 @@ struct Edge {
     int a, b;
 
     Edge(int a, int b);
+    string to_string();
 
     bool operator < (const Edge& a) const;
 };

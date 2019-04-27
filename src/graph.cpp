@@ -26,6 +26,10 @@ bool Edge::operator<(const Edge &right) const {
         return this->a < right.a;
 }
 
+string Edge::to_string() {
+    return "(" + std::to_string(this->a + 1) + " : " + std::to_string(this->b + 1) + ")";
+}
+
 Graph::Graph(int n, Edges edges) {
     this->n = n;
     this->matrix = new int*[n];
