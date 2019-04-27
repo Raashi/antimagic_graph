@@ -37,8 +37,9 @@ void _g6_from(int argc, char **argv);
 void test_tree(int, char** argv) {
     string g6 = argv[2];
     Graph g(g6);
-    numeration_t numer = numerate(&g);
-    map<Edge, int> phi = numer.first;
+
+    numeration_t numer = numerate2(&g);
+    phi_t phi = numer.first;
 
     for (auto it : phi) {
         Edge e = it.first;
@@ -49,6 +50,17 @@ void test_tree(int, char** argv) {
         cout << "correct" << endl;
     else
         cout << "non-correct" << endl;
+
+    /*
+    cout << "Testing tree " << g6 << endl;
+    VecVertices levels = get_levels(&g);
+    for (int level = 0; level < levels.size(); ++level) {
+        cout << level << ": ";
+        for (Vertex v : levels[level])
+            cout << v << ", ";
+        cout << endl;
+    }
+     */
 }
 
 void brute_tree(int, char** argv) {
@@ -93,9 +105,7 @@ void brute_tree(int, char** argv) {
     cout << "Correct single: " << single_correct << " / " << singles << endl;
     cout << "Correct bi: " << bi_correct << " / " << bis << endl;
 
-    ofstream output_file("noncorrect.txt");
-    ostream_iterator<string> output_iterator(output_file, "\n");
-    copy(noncorrect.begin(), noncorrect.end(), output_iterator);
+    write_to_file("noncorrect.txt", noncorrect);
 }
 
 
@@ -105,10 +115,10 @@ int main(int argc, char **argv) {
 
     string op = argv[1];
     switch (opts[op]) {
-        case      BRUTE: _brute(argc, argv);
-        case         G6: _g6(argc, argv);
+        case      BRUTE: _brute(argc, argv); break;
+        case         G6: _g6(argc, argv); break;
         case       TREE: test_tree(argc, argv); break;
-        case BRUTE_TREE: brute_tree(argc, argv);
+        case BRUTE_TREE: brute_tree(argc, argv); break;
         default        : break;
     }
 

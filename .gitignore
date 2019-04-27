@@ -9,6 +9,7 @@ libgcc_s_seh-1.dll
 libstdc++-6.dll
 skipped.txt
 g.docx
+~$g.docx
 
 # Python
 venv

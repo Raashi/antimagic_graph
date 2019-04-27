@@ -151,9 +151,7 @@ void ThreadPull::run(worker_t worker, void* arg, worker_final_t worker_final) {
 void ThreadPull::write_skipped() {
     if (!this->skip || this->vec_skipped.empty())
         return;
-    ofstream output_file("skipped.txt");
-    ostream_iterator<string> output_iterator(output_file, "\n");
-    copy(this->vec_skipped.begin(), this->vec_skipped.end(), output_iterator);
+    write_to_file("skipped.txt", this->vec_skipped);
 }
 
 WorkerArg::WorkerArg(ThreadPull *tp, void *bp, worker_t worker) {

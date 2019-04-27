@@ -2,6 +2,8 @@
 #define ANTIMAGIC_GRAPH_H
 
 #include <string>
+#include <set>
+#include <map>
 
 #include "utils.h"
 
@@ -12,6 +14,7 @@ typedef int Vertex;
 typedef vector<Vertex> Vertices;
 typedef vector<Vertices> VecVertices;
 
+const uint INFINITE_DISTANCE = UINT_MAX;
 
 const uint ANTIMAGIC_YES = 1;
 const uint ANTIMAGIC_NO = 0;
@@ -28,6 +31,7 @@ struct Edge {
 };
 typedef vector<Edge> Edges;
 
+typedef map<Edge, int> phi_t;
 
 struct Graph {
     int n;
@@ -46,6 +50,10 @@ struct Graph {
     string to_graph6();
 
     uint is_antimagic(bool skip, double time_overflow);
+
+    uint get_distance(Vertex, Vertex);
+    Vertices get_path(Vertex, Vertex);
+    vector<uint> get_all_distances(Vertex, set<Vertex>* = nullptr);
 };
 
 

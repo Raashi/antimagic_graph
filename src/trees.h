@@ -8,7 +8,10 @@
 
 using namespace std;
 
-typedef pair<map<Edge, int>, bool> numeration_t;
+typedef pair<phi_t, bool> numeration_t;
+
+VecVertices get_levels(Graph* g);
+numeration_t numerate2(Graph*);
 
 numeration_t numerate(Graph*);
 bool test_numeration(Graph*, const map<Edge, int>&);

@@ -2,6 +2,7 @@
 #include <map>
 #include <algorithm>
 #include <time.h>
+#include <queue>
 
 #include "perms.h"
 #include "graph.h"
@@ -202,4 +203,76 @@ uint Graph::is_antimagic(bool skip, double time_overflow) {
     }
     // return false if antimagic phi was never found
     return ANTIMAGIC_NO;
+}
+
+uint Graph::get_distance(Vertex u, Vertex v) {
+    vector<uint> distances(this->n, INFINITE_DISTANCE);
+    distances[u] = 0;
+    queue<Vertex> q;
+    q.push(u);
+
+    while (!q.empty()) {
+        Vertex t = q.front();
+        q.pop();
+        for (Vertex ti = 0; ti < this->n; ++ti)
+            if (this->matrix[t][ti] == 1 && distances[ti] == INFINITE_DISTANCE) {
+                if (ti == v)
+                    return distances[t] + 1;
+                q.push(ti);
+                distances[ti] = distances[t] + 1;
+            }
+    }
+    throw runtime_error("Vertex is unreachable");
+}
+
+vector<uint> Graph::get_all_distances(Vertex u, set<Vertex>* ignored) {
+    if (ignored == nullptr)
+        ignored = new set<Vertex>();
+
+    vector<uint> distances(this->n, INFINITE_DISTANCE);
+    distances[u] = 0;
+    queue<Vertex> q;
+    q.push(u);
+
+    while (!q.empty()) {
+        Vertex t = q.front();
+        q.pop();
+        for (Vertex ti = 0; ti < this->n; ++ti)
+            if (this->matrix[t][ti] == 1 && distances[ti] == INFINITE_DISTANCE) {
+                if (ignored->find(ti) != ignored->end())
+                    continue;
+                q.push(ti);
+                distances[ti] = distances[t] + 1;
+            }
+    }
+    return distances;
+}
+
+Vertices Graph::get_path(Vertex u, Vertex v) {
+    Vertices ancestors(this->n, this->n + 1);
+    ancestors[u] = u;
+    queue<Vertex> q;
+    q.push(u);
+
+    while (!q.empty()) {
+        Vertex t = q.front();
+        if (t == v)
+            break;
+        q.pop();
+        for (Vertex ti = 0; ti < this->n; ++ti)
+            if (this->matrix[t][ti] == 1 && ancestors[ti] == this->n + 1) {
+                q.push(ti);
+                ancestors[ti] = t;
+            }
+    }
+
+    Vertices path;
+    path.push_back(v);
+    Vertex cur = v;
+    while (ancestors[cur] != cur) {
+        path.push_back(ancestors[cur]);
+        cur = ancestors[cur];
+    }
+    reverse(path.begin(), path.end());
+    return path;
 }

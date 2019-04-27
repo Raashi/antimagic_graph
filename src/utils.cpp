@@ -1,6 +1,7 @@
 #include <sstream>
 #include <exception>
-#include <string>
+#include <fstream>
+#include <iterator>
 #include <stdlib.h>
 
 #include "utils.h"
@@ -33,7 +34,7 @@ string get_arg(int argc, char **argv, string arg, string def) {
         string opt = argv[i];
         if (opt == arg) {
             if (i + 1 == argc)
-                throw "No value for argument '" + arg + "'";
+                throw runtime_error("No value for argument '" + arg + "'");
             string value = argv[i + 1];
             return value;
         }
@@ -73,4 +74,11 @@ double get_arg(int argc, char **argv, string arg, double def) {
         puts((ERROR_MSG + "Error when taking argument double-value for '" + arg + "'").c_str());
         throw runtime_error(ERROR_MSG + error.what());
     }
+}
+
+
+void write_to_file(const string& filename, vector<string> data) {
+    ofstream output_file(filename);
+    ostream_iterator<string> output_iterator(output_file, "\n");
+    copy(data.begin(), data.end(), output_iterator);
 }
