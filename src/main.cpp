@@ -30,83 +30,11 @@ map<string, int> opts = { // NOLINT(cert-err58-cpp)
 };
 
 void _brute(int argc, char **argv);
+void _brute_tree(int argc, char** argv);
+void _test_tree(int, char** argv);
 void _g6(int argc, char **argv);
 void _g6_to();
 void _g6_from(int argc, char **argv);
-
-void test_tree(int, char** argv) {
-    string g6 = argv[2];
-    Graph g(g6);
-
-    numeration_t numer = numerate2(&g);
-    phi_t phi = numer.first;
-
-    for (auto it : phi) {
-        Edge e = it.first;
-        cout << e.to_string() << " -> " << it.second << endl;
-    }
-
-    if (test_numeration(&g, phi))
-        cout << "correct" << endl;
-    else
-        cout << "non-correct" << endl;
-
-    /*
-    cout << "Testing tree " << g6 << endl;
-    VecVertices levels = get_levels(&g);
-    for (int level = 0; level < levels.size(); ++level) {
-        cout << level << ": ";
-        for (Vertex v : levels[level])
-            cout << v << ", ";
-        cout << endl;
-    }
-     */
-}
-
-void brute_tree(int, char** argv) {
-    ifstream file(argv[2]);
-
-    int count = 0;
-    int all = 0;
-    int single_correct = 0;
-    int singles = 0;
-    int bi_correct = 0;
-    int bis = 0;
-
-    vector<string> noncorrect;
-
-    string line;
-    while (true) {
-        if (not (bool) getline(file, line))
-            break;
-
-        Graph g(line);
-        numeration_t numer = numerate(&g);
-        map<Edge, int> phi = numer.first;
-
-        all++;
-
-        bool correct = test_numeration(&g, phi);
-        if (numer.second)
-            bis++;
-        else
-            singles++;
-        if (correct) {
-            count++;
-            if (numer.second)
-                bi_correct++;
-            else
-                single_correct++;
-        } else
-            noncorrect.push_back(line);
-    }
-    file.close();
-    cout << "Correct: " << count << " / " << all << endl;
-    cout << "Correct single: " << single_correct << " / " << singles << endl;
-    cout << "Correct bi: " << bi_correct << " / " << bis << endl;
-
-    write_to_file("noncorrect.txt", noncorrect);
-}
 
 
 int main(int argc, char **argv) {
@@ -117,13 +45,14 @@ int main(int argc, char **argv) {
     switch (opts[op]) {
         case      BRUTE: _brute(argc, argv); break;
         case         G6: _g6(argc, argv); break;
-        case       TREE: test_tree(argc, argv); break;
-        case BRUTE_TREE: brute_tree(argc, argv); break;
+        case       TREE: _test_tree(argc, argv); break;
+        case BRUTE_TREE: _brute_tree(argc, argv); break;
         default        : break;
     }
 
     return 0;
 }
+
 
 void _brute(int argc, char **argv) {
     if (argc < 3)
@@ -137,6 +66,39 @@ void _brute(int argc, char **argv) {
     file.close();
 }
 
+
+void _brute_tree(int argc, char** argv) {
+    if (argc < 3)
+        throw runtime_error("Wrong arguments");
+
+    ifstream file(argv[2]);
+
+    ThreadPull tp{argc, argv, &file};
+    TreesBruteParams tbp;
+    tp.run(worker_trees, (void*) &tbp, worker_trees_finalize);
+    file.close();
+}
+
+
+void _test_tree(int, char** argv) {
+    string g6 = argv[2];
+    Graph g(g6);
+
+    numeration_t numer = numerate(&g);
+    phi_t phi = numer.first;
+
+    for (auto it : phi) {
+        Edge e = it.first;
+        cout << e.to_string() << " -> " << it.second << endl;
+    }
+
+    if (test_numeration(&g, phi))
+        cout << "correct" << endl;
+    else
+        cout << "non-correct" << endl;
+}
+
+
 void _g6(int argc, char **argv) {
     if (argc == 2)
         throw runtime_error("Wrong arguments");
@@ -148,6 +110,7 @@ void _g6(int argc, char **argv) {
         default        : break;
     }
 }
+
 
 void _g6_to() {
     int n, m;
@@ -163,7 +126,8 @@ void _g6_to() {
     cout << Graph(n, edges).to_graph6() << endl;
 }
 
-void _g6_from(int argc, char **argv) {
+
+void _g6_from(int, char**) {
     string graph6;
     cout << "Enter graph in graph6 format: ";
     cin >> graph6;

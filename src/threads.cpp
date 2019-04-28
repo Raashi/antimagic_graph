@@ -143,7 +143,7 @@ void ThreadPull::run(worker_t worker, void* arg, worker_final_t worker_final) {
 
     time(&end);
     double elapsed = difftime(end, start);
-    cout << "Elapsed time: " << elapsed / 60 << " minutes" << endl;
+    cout << SYS_MSG << "Elapsed time: " << elapsed / 60 << " minutes" << endl;
 
     this->write_skipped();
 }
