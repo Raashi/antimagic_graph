@@ -3,21 +3,21 @@
 #include <map>
 #include <fstream>
 #include <exception>
-#include <iterator>
 
 #include "perms.h"
 #include "graph.h"
 #include "threads.h"
 #include "brute.h"
+#include "utils.h"
 
 using namespace std;
+
 
 const int BRUTE = 0;
 const int G6 = 1;
 const int G6_TO = 2;
 const int G6_FROM = 3;
-const int TREE = 4;
-const int BRUTE_TREE = 5;
+
 
 map<string, int> opts = { // NOLINT(cert-err58-cpp)
         {"brute", BRUTE},
@@ -25,6 +25,7 @@ map<string, int> opts = { // NOLINT(cert-err58-cpp)
         {"to", G6_TO},
         {"from", G6_FROM},
 };
+
 
 void _brute(int argc, char **argv);
 void _g6(int argc, char **argv);
@@ -34,7 +35,7 @@ void _g6_from(int argc, char **argv);
 
 int main(int argc, char **argv) {
     if (argc < 2)
-        throw runtime_error("Wrong arguments");
+        throw runtime_error("Не передан порядковый аргумент управления режимом!");
 
     string op = argv[1];
     switch (opts[op]) {
@@ -49,7 +50,7 @@ int main(int argc, char **argv) {
 
 void _brute(int argc, char **argv) {
     if (argc < 3)
-        throw runtime_error("Wrong arguments");
+        throw runtime_error("Не передано имя файла для перебора!");
 
     ifstream file(argv[2]);
 
@@ -75,10 +76,10 @@ void _g6(int argc, char **argv) {
 
 void _g6_to() {
     int n, m;
-    cout << "Enter number of vertices (n) and number of edges (m):\n";
+    cout << "Введите количество вершин (n) и количество ребер (m):\n";
     cin >> n >> m;
     Edges edges;
-    cout << "Enter m edges:\n";
+    cout << "Введите m ребер:\n";
     for (int i = 0; i < m; ++i) {
         int a, b;
         cin >> a >> b;
@@ -90,7 +91,7 @@ void _g6_to() {
 
 void _g6_from(int, char**) {
     string graph6;
-    cout << "Enter graph in graph6 format: ";
+    cout << "Введите строку graph6: ";
     cin >> graph6;
     Graph(graph6).display();
 }
