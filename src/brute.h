@@ -29,11 +29,14 @@ struct AntimagicBruteParams {
     vector<string> vec_not_antimagic;
     Mutex mutex_vec;
 
+    bool check_only_not_connected;
+
     void print_stat(bool same_line);
     void print_stat_inline();
 
-    explicit AntimagicBruteParams(bool write_not_antimagic) {
+    explicit AntimagicBruteParams(bool write_not_antimagic, bool check_only_not_connected) {
         this->write_not_antimagic = write_not_antimagic;
+        this->check_only_not_connected = check_only_not_connected;
     }
 };
 

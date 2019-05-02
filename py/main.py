@@ -16,7 +16,9 @@ def main():
     for g6 in list_g6:
         bio = BytesIO(g6.encode())
         graph = nx.read_graph6(bio)
-        nx.draw(graph)
+        nx.draw(graph, with_labels=True, node_size=2000, node_color='w', pos=nx.circular_layout(graph))
+        ax = plt.gca()
+        ax.collections[0].set_edgecolor('black') 
 
         buffer = BytesIO()
         plt.savefig(buffer, format='png')

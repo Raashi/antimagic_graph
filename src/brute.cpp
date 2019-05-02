@@ -27,12 +27,16 @@ uint worker_antimagic(void* arg, string line) {
     auto * bp = (AntimagicBruteParams*) wa->bp;
 
     Graph g(line);
-    int antimagic = g.is_antimagic(wa->tp->skip, wa->tp->skip_time);
-    bool connected = g.is_connected();
 
+    bool connected = g.is_connected();
     connected ? bp->connected++ : bp->not_connected++;
 
+    if (bp->check_only_not_connected && !connected)
+        return ANTIMAGIC_SKIPPED;
+
+    int antimagic = g.is_antimagic(wa->tp->skip, wa->tp->skip_time);
     bp->checked++;
+
     if (antimagic == ANTIMAGIC_YES) {
         bp->antimagic++;
         connected ? bp->connected_antimagic++ : bp->not_connected_antimagic++;
