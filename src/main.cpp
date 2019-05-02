@@ -3,13 +3,11 @@
 #include <map>
 #include <fstream>
 #include <exception>
-#include <locale.h>
 
 #include "perms.h"
 #include "graph.h"
 #include "threads.h"
 #include "brute.h"
-#include "utils.h"
 
 using namespace std;
 
@@ -35,16 +33,8 @@ void _g6_from(int argc, char **argv);
 
 
 int main(int argc, char **argv) {
-#ifdef _WIN32
-    setlocale(LC_ALL, "Russian");
-#else
-    locale::global(locale(""));
-    wcout.imbue(locale(""));
-#endif
-    if (argc < 2) {
-        wcout << L"Не передан порядковый аргумент управления режимом!\n";
-        throw runtime_error("Не передан порядковый аргумент управления режимом!");
-    }
+    if (argc < 2)
+        throw runtime_error("Wrong arguments");
 
     string op = argv[1];
     switch (opts[op]) {
@@ -59,7 +49,7 @@ int main(int argc, char **argv) {
 
 void _brute(int argc, char **argv) {
     if (argc < 3)
-        throw runtime_error("Не передано имя файла для перебора!");
+        throw runtime_error("Wrong arguments");
 
     ifstream file(argv[2]);
 
@@ -85,10 +75,10 @@ void _g6(int argc, char **argv) {
 
 void _g6_to() {
     int n, m;
-    cout << "Введите количество вершин (n) и количество ребер (m):\n";
+    cout << "Enter vertices count (n) and edges count (m):\n";
     cin >> n >> m;
     Edges edges;
-    cout << "Введите m ребер:\n";
+    cout << "Enter m edges:\n";
     for (int i = 0; i < m; ++i) {
         int a, b;
         cin >> a >> b;
@@ -100,7 +90,7 @@ void _g6_to() {
 
 void _g6_from(int, char**) {
     string graph6;
-    cout << "Введите строку graph6: ";
+    cout << "Enter graph6 string: ";
     cin >> graph6;
     Graph(graph6).display();
 }
