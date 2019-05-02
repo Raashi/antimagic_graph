@@ -35,9 +35,14 @@ void _g6_from(int argc, char **argv);
 
 
 int main(int argc, char **argv) {
+#ifdef _WIN32
     setlocale(LC_ALL, "Russian");
+#else
+    locale::global(locale(""));
+    wcout.imbue(locale(""));
+#endif
     if (argc < 2) {
-        wprintf(L"Не передан порядковый аргумент управления режимом!\n");
+        wcout << L"Не передан порядковый аргумент управления режимом!\n";
         throw runtime_error("Не передан порядковый аргумент управления режимом!");
     }
 
