@@ -4,6 +4,7 @@
 #include <fstream>
 #include <atomic>
 #include <vector>
+#include <string>
 
 #include "threads.h"
 #include "utils.h"
@@ -24,8 +25,16 @@ struct AntimagicBruteParams {
 
     Mutex mutex_print;
 
+    bool write_not_antimagic;
+    vector<string> vec_not_antimagic;
+    Mutex mutex_vec;
+
     void print_stat(bool same_line);
     void print_stat_inline();
+
+    explicit AntimagicBruteParams(bool write_not_antimagic) {
+        this->write_not_antimagic = write_not_antimagic;
+    }
 };
 
 

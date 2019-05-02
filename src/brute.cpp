@@ -40,6 +40,12 @@ uint worker_antimagic(void* arg, string line) {
     else if (antimagic == ANTIMAGIC_NO) {
         bp->non_antimagic++;
         connected ? bp->connected_non_antimagic++ : bp->not_connected_non_antimagic++;
+
+        if (bp->write_not_antimagic) {
+            bp->mutex_vec.lock();
+            bp->vec_not_antimagic.push_back(line);
+            bp->mutex_vec.unlock();
+        }
     }
 
     bp->print_stat_inline();
@@ -63,6 +69,8 @@ void worker_antimagic_finalize(void* arg) {
            (int) bp->not_connected,
            (int) bp->not_connected_antimagic,
            (int) bp->not_connected_non_antimagic);
+    if (bp->write_not_antimagic)
+        write_to_file("not_antimagic.txt", bp->vec_not_antimagic);
 }
 
 void AntimagicBruteParams::print_stat_inline() {

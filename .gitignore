@@ -10,6 +10,7 @@ libstdc++-6.dll
 skipped.txt
 g.docx
 ~$g.docx
+not_antimagic.txt
 
 # Python
 venv

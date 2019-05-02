@@ -54,7 +54,7 @@ void _brute(int argc, char **argv) {
     ifstream file(argv[2]);
 
     ThreadPull tp{argc, argv, &file};
-    AntimagicBruteParams abp;
+    AntimagicBruteParams abp(has_arg(argc, argv, "-w"));
     tp.run(worker_antimagic, (void*) &abp, worker_antimagic_finalize);
     file.close();
 }
