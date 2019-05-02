@@ -11,8 +11,16 @@
 
 struct AntimagicBruteParams {
     atomic_int checked{0};
+    atomic_int antimagic{0};
     atomic_int non_antimagic{0};
-    atomic_int skipped{0};
+
+    atomic_int connected{0};
+    atomic_int connected_antimagic{0};
+    atomic_int connected_non_antimagic{0};
+
+    atomic_int not_connected{0};
+    atomic_int not_connected_antimagic{0};
+    atomic_int not_connected_non_antimagic{0};
 
     Mutex mutex_print;
 
@@ -21,25 +29,7 @@ struct AntimagicBruteParams {
 };
 
 
-struct TreesBruteParams {
-    atomic_int checked{0};
-    atomic_int non_antimagic{0};
-    atomic_int single{0};
-    atomic_int single_correct{0};
-    atomic_int bis{0};
-    atomic_int bis_correct{0};
-
-    Mutex mutex_print;
-    Mutex mutex_non_correct;
-
-    vector<string> non_correct;
-};
-
-
 uint worker_antimagic(void*, string);
 void worker_antimagic_finalize(void*);
-
-uint worker_trees(void*, string);
-void worker_trees_finalize(void*);
 
 #endif //ANTIMAGIC_BRUTE_H

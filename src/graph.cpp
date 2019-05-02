@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <time.h>
 #include <queue>
+#include <exception>
 
 #include "perms.h"
 #include "graph.h"
@@ -69,10 +70,13 @@ Graph::Graph(string &graph6) {
                 row = 0;
                 col++;
             }
-            if (col == n)
+            if (col == n) {
+                init_adj_list();
                 return;
+            }
         }
     }
+    throw runtime_error("Error decoding graph6: " + graph6);
 }
 
 Graph::~Graph() {
@@ -114,6 +118,11 @@ Vertices Graph::get_isolated() {
     return vertices;
 }
 
+void Graph::init_adj_list() {
+    if (adj.empty())
+        adj = get_adj_list();
+}
+
 void Graph::display() {
     for (int i = 0; i < this->n; ++i) {
         for (int j = 0; j < this->n; ++j)
@@ -151,7 +160,7 @@ uint Graph::is_antimagic(bool skip, double time_overflow) {
     if (this->get_isolated().size() > 1)
         return ANTIMAGIC_NO;
     // 2nd optimization: if there is K2 connected component in G
-    VecVertices adj = this->get_adj_list();
+    init_adj_list();
     for (int i = 0; i < this->n; ++i)
         if (adj[i].size() == 1)
             if (adj[adj[i][0]].size() == 1 && adj[adj[i][0]][0] == i)
@@ -275,4 +284,12 @@ Vertices Graph::get_path(Vertex u, Vertex v) {
     }
     reverse(path.begin(), path.end());
     return path;
+}
+
+bool Graph::is_connected() {
+    vector<uint> distances = get_all_distances(0);
+    for (uint d : distances)
+        if (d == INFINITE_DISTANCE)
+            return false;
+    return true;
 }

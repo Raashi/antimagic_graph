@@ -36,6 +36,7 @@ typedef map<Edge, int> phi_t;
 struct Graph {
     int n;
     int** matrix;
+    VecVertices adj;
 
     explicit Graph(string& graph6);
     Graph(int n, Edges edges);
@@ -43,12 +44,15 @@ struct Graph {
 
     Edges get_edges();
     Vertices get_isolated();
+
+    void init_adj_list();
     VecVertices get_adj_list();
 
     void display();
 
     string to_graph6();
 
+    bool is_connected();
     uint is_antimagic(bool skip, double time_overflow);
 
     uint get_distance(Vertex, Vertex);
