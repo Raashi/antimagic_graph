@@ -3,6 +3,7 @@
 #include <map>
 #include <fstream>
 #include <exception>
+#include <locale.h>
 
 #include "perms.h"
 #include "graph.h"
@@ -34,8 +35,11 @@ void _g6_from(int argc, char **argv);
 
 
 int main(int argc, char **argv) {
-    if (argc < 2)
+    setlocale(LC_ALL, "Russian");
+    if (argc < 2) {
+        wprintf(L"Не передан порядковый аргумент управления режимом!\n");
         throw runtime_error("Не передан порядковый аргумент управления режимом!");
+    }
 
     string op = argv[1];
     switch (opts[op]) {
