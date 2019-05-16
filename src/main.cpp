@@ -8,6 +8,7 @@
 #include "graph.h"
 #include "threads.h"
 #include "brute.h"
+#include "brute_strong.h"
 
 using namespace std;
 
@@ -16,10 +17,12 @@ const int BRUTE = 0;
 const int G6 = 1;
 const int G6_TO = 2;
 const int G6_FROM = 3;
+const int IBRUTE = 4;
 
 
 map<string, int> opts = { // NOLINT(cert-err58-cpp)
         {"brute", BRUTE},
+        {"ibrute", IBRUTE},
         {"g6", G6},
         {"to", G6_TO},
         {"from", G6_FROM},
@@ -27,6 +30,7 @@ map<string, int> opts = { // NOLINT(cert-err58-cpp)
 
 
 void _brute(int argc, char **argv);
+void _ibrute(int argc, char **argv);
 void _g6(int argc, char **argv);
 void _g6_to();
 void _g6_from(int argc, char **argv);
@@ -38,9 +42,10 @@ int main(int argc, char **argv) {
 
     string op = argv[1];
     switch (opts[op]) {
-        case    BRUTE: _brute(argc, argv); break;
-        case       G6: _g6(argc, argv);    break;
-        default      :                     break;
+        case    BRUTE: _brute(argc, argv);  break;
+        case   IBRUTE: _ibrute(argc, argv); break;
+        case       G6: _g6(argc, argv);     break;
+        default      :                      break;
     }
 
     return 0;
@@ -54,8 +59,26 @@ void _brute(int argc, char **argv) {
     ifstream file(argv[2]);
 
     ThreadPull tp{argc, argv, &file};
-    AntimagicBruteParams abp(has_arg(argc, argv, "-w"), has_arg(argc, argv, "-nc"));
+    AntimagicBruteParams abp(
+            has_arg(argc, argv, "-w"),
+            has_arg(argc, argv, "-nc"));
     tp.run(worker_antimagic, (void*) &abp, worker_antimagic_finalize);
+    file.close();
+}
+
+
+void _ibrute(int argc, char **argv) {
+    if (argc < 3)
+        throw runtime_error("Wrong arguments");
+
+    ifstream file(argv[2]);
+
+    ThreadPull tp{argc, argv, &file};
+    AntimagicBruteParams abp(
+            has_arg(argc, argv, "-w"),
+            has_arg(argc, argv, "-nc"));
+    StrongAntimagicBruteParams sabp(&abp, get_arg(argc, argv, "-inc", 0));
+    tp.run(worker_strong_antimagic, (void*) &sabp, worker_strong_antimagic_finalize);
     file.close();
 }
 
