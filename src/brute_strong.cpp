@@ -2,6 +2,29 @@
 #include "brute_strong.h"
 
 
+StrongAntimagicBruteParams::StrongAntimagicBruteParams(AntimagicBruteParams *abp, int increment_max) {
+    this->abp = abp;
+    this->increment_max = increment_max;
+}
+
+
+void StrongAntimagicBruteParams::print_stat(bool same_line) {
+    printf("\rChecked: %i Not strong antimagic: %i%s",
+           (int) this->abp->checked,
+           (int) this->abp->non_antimagic,
+           same_line ? "" : "\n");
+}
+
+void StrongAntimagicBruteParams::print_stat_inline() {
+    if (this->abp->checked % 10 == 0) {
+        this->abp->mutex_print.lock();
+        this->print_stat(true);
+        fflush(stdout);
+        this->abp->mutex_print.unlock();
+    }
+}
+
+
 uint worker_strong_antimagic(void* arg, string line) {
     auto * wa = (WorkerArg*) arg;
     auto * sabp = (StrongAntimagicBruteParams*) wa->bp;
@@ -38,7 +61,7 @@ uint worker_strong_antimagic(void* arg, string line) {
         }
     }
 
-    abp->print_stat_inline();
+    sabp->print_stat_inline();
 
     return WORKER_RETURN_OKAY;
 }
@@ -48,15 +71,16 @@ void worker_strong_antimagic_finalize(void* arg) {
     auto * wa = (WorkerArg*) arg;
     auto * sabp = (StrongAntimagicBruteParams*) wa->bp;
     auto * abp = sabp->abp;
-    abp->print_stat(false);
+    sabp->print_stat(false);
+    printf("Maximum increment: %i\n", sabp->increment_max);
     printf("Connected all: %i\n"
-           "Connected and antimagic: %i\n"
-           "Connected and not antimagic: %i\n",
+           "Connected and possible strong antimagic: %i\n"
+           "Connected and not strong antimagic: %i\n",
            (int) abp->connected,
            (int) abp->connected_antimagic,
            (int) abp->connected_non_antimagic);
     printf("Not connected: %i\n"
-           "Not connected and antimagic: %i\n"
+           "Not connected and possible strong antimagic: %i\n"
            "Not connected and not antimagic: %i\n",
            (int) abp->not_connected,
            (int) abp->not_connected_antimagic,

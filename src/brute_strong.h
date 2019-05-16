@@ -5,13 +5,12 @@
 
 struct StrongAntimagicBruteParams {
     AntimagicBruteParams* abp;
-
     int increment_max;
 
-    StrongAntimagicBruteParams (AntimagicBruteParams* abp, int increment_max) {
-        this->abp = abp;
-        this->increment_max = increment_max;
-    }
+    StrongAntimagicBruteParams(AntimagicBruteParams*, int increment_max);
+
+    void print_stat(bool same_line);
+    void print_stat_inline();
 };
 
 
