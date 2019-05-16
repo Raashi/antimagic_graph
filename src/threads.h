@@ -20,17 +20,15 @@ typedef uint (*worker_t)(void*, string);
 typedef void (*worker_final_t)(void*);
 
 const uint WORKER_RETURN_OKAY = 0;
-const uint WORKER_RETURN_SKIPPED = 1;
 
 const ulong  DEFAULT_THREAD_COUNT = 4;
-const double DEFAULT_SKIP_TIME = 0.2;
 
 
 struct Mutex {
 #ifdef _WIN32
     CRITICAL_SECTION cs{};
 #else
-    pthread_mutex_t mutex;
+    pthread_mutex_t mutex{};
 #endif
 
     Mutex ();
@@ -48,11 +46,6 @@ struct ThreadPull {
     atomic_int data_skipped{0};
 
     Mutex mutex;
-    Mutex mutex_skipped;
-
-    bool skip;
-    double skip_time;
-    vector<string> vec_skipped;
 
     ifstream* fp;
     ulong thread_count;
@@ -60,7 +53,6 @@ struct ThreadPull {
     ThreadPull(int, char**, ifstream*);
 
     void run(worker_t, void*, worker_final_t=nullptr);
-    void write_skipped();
 };
 
 struct WorkerArg {

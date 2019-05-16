@@ -20,6 +20,7 @@ Mutex::Mutex() {
 #endif
 }
 
+
 Mutex::~Mutex() {
 #ifdef _WIN32
     DeleteCriticalSection(&this->cs);
@@ -27,6 +28,7 @@ Mutex::~Mutex() {
     pthread_mutex_destroy(&this->mutex);
 #endif
 }
+
 
 void Mutex::lock() {
 #ifdef _WIN32
@@ -36,6 +38,7 @@ void Mutex::lock() {
 #endif
 }
 
+
 void Mutex::unlock() {
 #ifdef _WIN32
     LeaveCriticalSection(&this->cs);
@@ -43,6 +46,7 @@ void Mutex::unlock() {
     pthread_mutex_unlock(&this->mutex);
 #endif
 }
+
 
 void exit_thread(int ret_val) {
 #ifdef _WIN32
@@ -52,20 +56,14 @@ void exit_thread(int ret_val) {
 #endif
 }
 
+
 ThreadPull::ThreadPull(int argc, char **argv, ifstream* fp) {
     this->fp = fp;
 
     this->thread_count = get_arg(argc, argv, "-tc", DEFAULT_THREAD_COUNT);
     cout << SYS_MSG << "Thread count set to " << thread_count << endl;
-
-    this->skip = has_arg(argc, argv, "-skip");
-    this->skip_time = get_arg(argc, argv, "-skt", DEFAULT_SKIP_TIME);
-    this->vec_skipped = vector<string>();
-
-    if (this->skip)
-        cout << SYS_MSG << "Maximum time for calculating graph set to "
-             << this->skip_time << " seconds" << endl;
 }
+
 
 uint main_worker(void* arg) {
     auto * wa = (WorkerArg*) arg;
@@ -88,15 +86,9 @@ uint main_worker(void* arg) {
         wa->tp->data_read++;
         if (ret_val == WORKER_RETURN_OKAY)
             wa->tp->data_okay++;
-        if (ret_val == WORKER_RETURN_SKIPPED) {
-            wa->tp->mutex_skipped.lock();
-            wa->tp->vec_skipped.push_back(line);
-            wa->tp->mutex_skipped.unlock();
-            wa->tp->data_skipped++;
-        }
-
     } while (true);
 }
+
 
 #ifdef _WIN32
 uint __stdcall windows_worker(void* arg) {
@@ -107,6 +99,7 @@ void* posix_worker(void* arg) {
     return new int(main_worker(arg));
 }
 #endif
+
 
 void ThreadPull::run(worker_t worker, void* arg, worker_final_t worker_final) {
     time_t start, end;
@@ -144,15 +137,8 @@ void ThreadPull::run(worker_t worker, void* arg, worker_final_t worker_final) {
     time(&end);
     double elapsed = difftime(end, start);
     cout << SYS_MSG << "Elapsed time: " << elapsed / 60 << " minutes" << endl;
-
-    this->write_skipped();
 }
 
-void ThreadPull::write_skipped() {
-    if (!this->skip || this->vec_skipped.empty())
-        return;
-    write_to_file("skipped.txt", this->vec_skipped);
-}
 
 WorkerArg::WorkerArg(ThreadPull *tp, void *bp, worker_t worker) {
     this->tp = tp;

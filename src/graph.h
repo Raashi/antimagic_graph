@@ -16,10 +16,6 @@ typedef vector<Vertices> VecVertices;
 
 const uint INFINITE_DISTANCE = UINT_MAX;
 
-const uint ANTIMAGIC_YES = 1;
-const uint ANTIMAGIC_NO = 0;
-const uint ANTIMAGIC_SKIPPED = 2;
-
 
 struct Edge {
     int a, b;
@@ -31,7 +27,9 @@ struct Edge {
 };
 typedef vector<Edge> Edges;
 
+
 typedef map<Edge, int> phi_t;
+
 
 struct Graph {
     int n;
@@ -53,7 +51,7 @@ struct Graph {
     string to_graph6();
 
     bool is_connected();
-    uint is_antimagic(bool skip, double time_overflow);
+    uint is_antimagic(int increment = 0);
 
     uint get_distance(Vertex, Vertex);
     Vertices get_path(Vertex, Vertex);

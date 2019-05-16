@@ -155,16 +155,16 @@ string Graph::to_graph6() {
     return g6;
 }
 
-uint Graph::is_antimagic(bool skip, double time_overflow) {
+uint Graph::is_antimagic(int increment) {
     // 1st optimization: isolated vertices count must be <= 1
     if (this->get_isolated().size() > 1)
-        return ANTIMAGIC_NO;
+        return false;
     // 2nd optimization: if there is K2 connected component in G
     init_adj_list();
     for (int i = 0; i < this->n; ++i)
         if (adj[i].size() == 1)
             if (adj[adj[i][0]].size() == 1 && adj[adj[i][0]][0] == i)
-                return ANTIMAGIC_NO;
+                return false;
 
     Edges edges = this->get_edges();
     PermGen gen(int(edges.size()));
@@ -172,13 +172,11 @@ uint Graph::is_antimagic(bool skip, double time_overflow) {
     map<Edge, int> phi = map<Edge, int>();
     vector<int> vec = vector<int>(this->n, 0);
 
-    time_t start, current;
-    time(&start);
     long long iteration = 0;
     while (perm != nullptr) {
         iteration++;
         for (int i = 0; i < edges.size(); ++i)
-            phi[edges[i]] = perm[i] + 1;  // phi: E -> [1, 2, ..., edges_count]
+            phi[edges[i]] = perm[i] + 1 + increment;  // phi: E -> [1, 2, ..., edges_count]
 
         // calc sum of phi for every vertex
         for (int i = 0; i < this->n; ++i) {
@@ -199,19 +197,11 @@ uint Graph::is_antimagic(bool skip, double time_overflow) {
 
         // return true if antimagic phi was found
         if (antimagic)
-            return ANTIMAGIC_YES;
-
-        // time optimization
-        if (skip && iteration % 1000 == 0) {
-                time(&current);
-                double elapsed = difftime(current, start);
-                if (elapsed > time_overflow)
-                    return ANTIMAGIC_SKIPPED;
-            }
+            return true;
         perm = gen.next();
     }
     // return false if antimagic phi was never found
-    return ANTIMAGIC_NO;
+    return false;
 }
 
 uint Graph::get_distance(Vertex u, Vertex v) {

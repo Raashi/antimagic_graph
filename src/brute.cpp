@@ -32,16 +32,16 @@ uint worker_antimagic(void* arg, string line) {
     connected ? bp->connected++ : bp->not_connected++;
 
     if (bp->check_only_not_connected && !connected)
-        return ANTIMAGIC_SKIPPED;
+        return WORKER_RETURN_OKAY;
 
-    int antimagic = g.is_antimagic(wa->tp->skip, wa->tp->skip_time);
+    bool antimagic = g.is_antimagic();
     bp->checked++;
 
-    if (antimagic == ANTIMAGIC_YES) {
+    if (antimagic) {
         bp->antimagic++;
         connected ? bp->connected_antimagic++ : bp->not_connected_antimagic++;
     }
-    else if (antimagic == ANTIMAGIC_NO) {
+    else {
         bp->non_antimagic++;
         connected ? bp->connected_non_antimagic++ : bp->not_connected_non_antimagic++;
 
@@ -54,7 +54,7 @@ uint worker_antimagic(void* arg, string line) {
 
     bp->print_stat_inline();
 
-    return antimagic == ANTIMAGIC_SKIPPED ? WORKER_RETURN_SKIPPED : WORKER_RETURN_OKAY;
+    return WORKER_RETURN_OKAY;
 }
 
 void worker_antimagic_finalize(void* arg) {
