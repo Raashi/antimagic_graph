@@ -6,8 +6,6 @@
 
 #include "utils.h"
 
-using namespace std;
-
 
 int string_to_int(string & value) {
     return stoi(value);

@@ -13,7 +13,13 @@ struct PermGen {
     int* perm;
     bool start;
 
-    explicit PermGen(int n);
+    bool randomize;
+    int rand_count;
+    int rand_i;
+    vector<int> perm_rand;
+    int* perm_rand_arr;
+
+    explicit PermGen(int n, bool randomize, int rand_count);
     int* next();
 
     ~PermGen();

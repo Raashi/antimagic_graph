@@ -33,6 +33,7 @@ typedef map<Edge, int> phi_t;
 
 struct Graph {
     int n;
+    int m;
     int** matrix;
     VecVertices adj;
 
@@ -41,6 +42,7 @@ struct Graph {
     ~Graph();
 
     Edges get_edges();
+    Edges get_divided_edges();
     Vertices get_isolated();
 
     void init_adj_list();

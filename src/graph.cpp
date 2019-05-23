@@ -1,12 +1,15 @@
 #include <iostream>
 #include <map>
-#include <algorithm>
 #include <time.h>
 #include <queue>
 #include <exception>
+#include <algorithm>
+
+#include <chrono>
 
 #include "perms.h"
 #include "graph.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -34,7 +37,8 @@ string Edge::to_string() {
 
 Graph::Graph(int n, Edges edges) {
     this->n = n;
-    this->matrix = new int*[n];
+    this->m = edges.size();
+    this->matrix = new int *[n];
     for (int i = 0; i < n; ++i) {
         this->matrix[i] = new int[n];
         for (int j = 0; j < n; ++j)
@@ -49,7 +53,8 @@ Graph::Graph(int n, Edges edges) {
 Graph::Graph(string &graph6) {
     // initialization
     this->n = int(graph6[0]) - 63;
-    this->matrix = new int*[n];
+    this->m = 0;
+    this->matrix = new int *[n];
     for (int i = 0; i < n; ++i) {
         this->matrix[i] = new int[n];
         // put zeros on main
@@ -64,6 +69,7 @@ Graph::Graph(string &graph6) {
             int bit = (isymbol >> ibit) & 1;
             this->matrix[row][col] = bit;
             this->matrix[col][row] = bit;
+            this->m += bit;
             // update indices
             row++;
             if (row == col) {
@@ -81,8 +87,8 @@ Graph::Graph(string &graph6) {
 
 Graph::~Graph() {
     for (int i = 0; i < this->n; ++i)
-        delete [] this->matrix[i];
-    delete [] this->matrix;
+        delete[] this->matrix[i];
+    delete[] this->matrix;
 }
 
 Edges Graph::get_edges() {
@@ -91,6 +97,24 @@ Edges Graph::get_edges() {
         for (int j = 0; j < i; ++j)
             if (this->matrix[i][j])
                 edges.emplace_back(i, j);
+    return edges;
+}
+
+Edges Graph::get_divided_edges() {
+    Edges edges;
+
+    vector<int> js(this->n, 0);
+    while (edges.size() < this->m) {
+        for (int i = this->n - 1; i >= 0; --i)
+            for (int j = js[i]; j < i; ++j) {
+                if (this->matrix[i][j]) {
+                    edges.emplace_back(i, j);
+                    js[i] += 1;
+                    break;
+                }
+                js[i] += 1;
+            }
+    }
     return edges;
 }
 
@@ -166,31 +190,29 @@ uint Graph::is_antimagic(int increment) {
             if (adj[adj[i][0]].size() == 1 && adj[adj[i][0]][0] == i)
                 return false;
 
-    Edges edges = this->get_edges();
-    PermGen gen(int(edges.size()));
-    int* perm = gen.next();
+    Edges edges = this->get_divided_edges();
+    PermGen gen(int(edges.size()), true, 200000);
+    int *perm = gen.next();
     map<Edge, int> phi = map<Edge, int>();
-    vector<int> vec = vector<int>(this->n, 0);
+    vector<int> f = vector<int>(this->n, 0);
 
-    long long iteration = 0;
     while (perm != nullptr) {
-        iteration++;
         for (int i = 0; i < edges.size(); ++i)
             phi[edges[i]] = perm[i] + 1 + increment;  // phi: E -> [1, 2, ..., edges_count]
 
         // calc sum of phi for every vertex
         for (int i = 0; i < this->n; ++i) {
-            vec[i] = 0;
+            f[i] = 0;
             for (int j = 0; j < this->n; ++j)
                 if (this->matrix[i][j])
-                    vec[i] += phi[Edge(i, j)];
+                    f[i] += phi[Edge(i, j)];
         }
 
         // looking for duplicates
-        sort(vec.begin(), vec.end());
+        sort(f.begin(), f.end());
         bool antimagic = true;
         for (int i = 0; i < this->n - 2; ++i)
-            if (vec[i] == vec[i + 1]) {
+            if (f[i] == f[i + 1]) {
                 antimagic = false;
                 break;
             }
@@ -224,7 +246,7 @@ uint Graph::get_distance(Vertex u, Vertex v) {
     throw runtime_error("Vertex is unreachable");
 }
 
-vector<uint> Graph::get_all_distances(Vertex u, set<Vertex>* ignored) {
+vector<uint> Graph::get_all_distances(Vertex u, set<Vertex> *ignored) {
     if (ignored == nullptr)
         ignored = new set<Vertex>();
 

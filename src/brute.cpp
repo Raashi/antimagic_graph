@@ -27,6 +27,7 @@ uint worker_antimagic(void* arg, string line) {
     auto * bp = (AntimagicBruteParams*) wa->bp;
 
     Graph g(line);
+    // bp->print_stat_inline(line);
 
     bool connected = g.is_connected();
     connected ? bp->connected++ : bp->not_connected++;
@@ -78,7 +79,7 @@ void worker_antimagic_finalize(void* arg) {
 }
 
 void AntimagicBruteParams::print_stat_inline() {
-    if (this->checked % 10 == 0) {
+    if (this->checked % 100 == 0) {
         this->mutex_print.lock();
         this->print_stat(true);
         fflush(stdout);
@@ -87,7 +88,7 @@ void AntimagicBruteParams::print_stat_inline() {
 }
 
 void AntimagicBruteParams::print_stat(bool same_line) {
-    printf("\rChecked: %i Non-antimagic: %i%s",
+    printf("\rChecked: %i Non-antimagic: %i %s",
             (int) this->checked,
             (int) this->non_antimagic,
             same_line ? "" : "\n");

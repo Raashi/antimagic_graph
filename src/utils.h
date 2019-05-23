@@ -3,11 +3,15 @@
 
 #include <string>
 #include <vector>
+#include <random>
 
 using namespace std;
 
 typedef unsigned int uint;
 typedef unsigned long ulong;
+
+
+mt19937 generator(random_device());
 
 
 const string SYS_MSG   = "[ SYS ] "; // NOLINT(cert-err58-cpp)
