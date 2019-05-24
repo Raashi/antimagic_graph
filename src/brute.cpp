@@ -48,9 +48,9 @@ uint worker_antimagic(void *arg, string line) {
             bp->vec_not_optimized.push_back(line);
             bp->mutex_vec.unlock();
         }
-        bp->mutex_vec.lock();
-        bp->vec_not_antimagic.push_back(line);
-        bp->mutex_vec.unlock();
+//        bp->mutex_vec.lock();
+//        bp->vec_not_antimagic.push_back(line);
+//        bp->mutex_vec.unlock();
     }
 
     bp->print_stat_inline();
@@ -77,8 +77,8 @@ void worker_antimagic_finalize(void *arg) {
     printf("Not antimagic and not optimized: %ld\n", (long) bp->not_antimagic_not_optimized);
     if (!bp->vec_not_optimized.empty())
         write_to_file("not_antimagic_not_optimized.txt", bp->vec_not_optimized);
-    if (!bp->vec_not_antimagic.empty())
-        write_to_file("not_antimagic.txt", bp->vec_not_antimagic);
+//    if (!bp->vec_not_antimagic.empty())
+//        write_to_file("not_antimagic.txt", bp->vec_not_antimagic);
 }
 
 void AntimagicBruteParams::print_stat_inline() {

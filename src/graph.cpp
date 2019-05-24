@@ -209,10 +209,7 @@ Graph::AntimagicResult Graph::is_antimagic(int increment) {
     return AntimagicResult{false, false};
 }
 
-vector<uint> Graph::get_all_distances(Vertex u, set<Vertex> *ignored) {
-    if (ignored == nullptr)
-        ignored = new set<Vertex>();
-
+vector<uint> Graph::get_all_distances(Vertex u) {
     vector<uint> distances(n, INFINITE_DISTANCE);
     distances[u] = 0;
     queue<Vertex> q;
@@ -223,8 +220,6 @@ vector<uint> Graph::get_all_distances(Vertex u, set<Vertex> *ignored) {
         q.pop();
         for (Vertex ti = 0; ti < n; ++ti)
             if (matrix[t][ti] == 1 && distances[ti] == INFINITE_DISTANCE) {
-                if (ignored->find(ti) != ignored->end())
-                    continue;
                 q.push(ti);
                 distances[ti] = distances[t] + 1;
             }

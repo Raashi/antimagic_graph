@@ -15,7 +15,7 @@ typedef vector<Vertex> Vertices;
 typedef vector<Vertices> VecVertices;
 
 const uint INFINITE_DISTANCE = UINT_MAX;
-const uint RANDOM_PERMUTATIONS_COUNT = 200000u;
+const uint RANDOM_PERMUTATIONS_COUNT = 2000000u;
 
 
 struct Edge {
@@ -58,7 +58,7 @@ struct Graph {
     bool is_connected();
     AntimagicResult is_antimagic(int increment = 0);
 
-    vector<uint> get_all_distances(Vertex, set<Vertex>* = nullptr);
+    vector<uint> get_all_distances(Vertex);
 };
 
 
