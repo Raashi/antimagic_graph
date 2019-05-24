@@ -27,7 +27,6 @@ uint worker_antimagic(void* arg, string line) {
     auto * bp = (AntimagicBruteParams*) wa->bp;
 
     Graph g(line);
-    // bp->print_stat_inline(line);
 
     bool connected = g.is_connected();
     connected ? bp->connected++ : bp->not_connected++;
@@ -62,18 +61,18 @@ void worker_antimagic_finalize(void* arg) {
     auto * wa = (WorkerArg*) arg;
     auto * bp = (AntimagicBruteParams*) wa->bp;
     bp->print_stat(false);
-    printf("Connected all: %i\n"
-           "Connected and antimagic: %i\n"
-           "Connected and not antimagic: %i\n",
-           (int) bp->connected,
-           (int) bp->connected_antimagic,
-           (int) bp->connected_non_antimagic);
+    printf("Connected all: %ld\n"
+           "Connected and antimagic: %ld\n"
+           "Connected and not antimagic: %ld\n",
+           (long) bp->connected,
+           (long) bp->connected_antimagic,
+           (long) bp->connected_non_antimagic);
     printf("Not connected: %i\n"
-           "Not connected and antimagic: %i\n"
-           "Not connected and not antimagic: %i\n",
-           (int) bp->not_connected,
-           (int) bp->not_connected_antimagic,
-           (int) bp->not_connected_non_antimagic);
+           "Not connected and antimagic: %ld\n"
+           "Not connected and not antimagic: %ld\n",
+           (long) bp->not_connected,
+           (long) bp->not_connected_antimagic,
+           (long) bp->not_connected_non_antimagic);
     if (bp->write_not_antimagic)
         write_to_file("not_antimagic.txt", bp->vec_not_antimagic);
 }
@@ -88,8 +87,8 @@ void AntimagicBruteParams::print_stat_inline() {
 }
 
 void AntimagicBruteParams::print_stat(bool same_line) {
-    printf("\rChecked: %i Non-antimagic: %i %s",
-            (int) checked,
-            (int) non_antimagic,
+    printf("\rChecked: %ld Non-antimagic: %ld %s",
+            (long) checked,
+            (long) non_antimagic,
             same_line ? "" : "\n");
 }

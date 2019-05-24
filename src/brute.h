@@ -11,17 +11,17 @@
 
 
 struct AntimagicBruteParams {
-    atomic_int checked{0};
-    atomic_int antimagic{0};
-    atomic_int non_antimagic{0};
+    atomic_long checked{0};
+    atomic_long antimagic{0};
+    atomic_long non_antimagic{0};
 
-    atomic_int connected{0};
-    atomic_int connected_antimagic{0};
-    atomic_int connected_non_antimagic{0};
+    atomic_long connected{0};
+    atomic_long connected_antimagic{0};
+    atomic_long connected_non_antimagic{0};
 
-    atomic_int not_connected{0};
-    atomic_int not_connected_antimagic{0};
-    atomic_int not_connected_non_antimagic{0};
+    atomic_long not_connected{0};
+    atomic_long not_connected_antimagic{0};
+    atomic_long not_connected_non_antimagic{0};
 
     Mutex mutex_print;
 
