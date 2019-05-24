@@ -26,9 +26,6 @@ struct PermGen {
     int* next();
 
     ~PermGen();
-
-private:
-    void assign_generator();
 };
 
 #endif //ANTIMAGIC_PERMS_H

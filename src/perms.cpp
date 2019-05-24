@@ -10,6 +10,8 @@
 using namespace std;
 
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-msc32-c"
 PermGen::PermGen(int n, bool randomize, int rand_count) {
     this->n = n;
     depth = n - 1;
@@ -24,11 +26,12 @@ PermGen::PermGen(int n, bool randomize, int rand_count) {
     this->randomize = randomize;
     this->rand_count = rand_count;
     rand_i = 0;
-    for (int i = 0; i < this->n; ++i)
+    for (int i = 0; i < n; ++i)
         perm_rand.push_back(i);
     perm_rand_arr = new int[n];
-    assign_generator();
+    g = mt19937_64(random_device{}());
 }
+#pragma clang diagnostic pop
 
 
 int* PermGen::next() {
@@ -39,11 +42,9 @@ int* PermGen::next() {
 
     if (randomize && rand_i < rand_count) {
         rand_i++;
-//        if (rand_i % 10000 == 0)
-//            assign_generator();
         for (int i = 0; i < n; ++i)
             perm_rand[i] = i;
-        shuffle(perm_rand.begin(), perm_rand.end(), g); // default_random_engine(seed));
+        shuffle(perm_rand.begin(), perm_rand.end(), g);
         for (int i = 0; i < n; ++i)
             perm_rand_arr[i] = perm_rand[i];
         return perm_rand_arr;
@@ -80,8 +81,4 @@ PermGen::~PermGen() {
     delete [] free;
     delete [] perm;
     delete [] perm_rand_arr;
-}
-
-void PermGen::assign_generator() {
-    g = mt19937_64(chrono::system_clock::now().time_since_epoch().count());
 }
