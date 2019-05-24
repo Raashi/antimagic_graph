@@ -194,7 +194,7 @@ Graph::AntimagicResult Graph::is_antimagic(int increment) {
         // looking for duplicates
         sort(f.begin(), f.end());
         bool antimagic = true;
-        for (int i = 0; i < n - 2; ++i)
+        for (int i = 0; i < n - 1; ++i)
             if (f[i] == f[i + 1]) {
                 antimagic = false;
                 break;
