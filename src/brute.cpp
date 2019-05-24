@@ -68,7 +68,7 @@ void worker_antimagic_finalize(void *arg) {
            (long) bp->connected,
            (long) bp->connected_antimagic,
            (long) bp->connected_not_antimagic);
-    printf("Not connected: %i\n"
+    printf("Not connected: %ld\n"
            "Not connected and antimagic: %ld\n"
            "Not connected and not antimagic: %ld\n",
            (long) bp->not_connected,

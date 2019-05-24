@@ -31,22 +31,6 @@ bool Edge::operator<(const Edge &right) const {
         return a < right.a;
 }
 
-Graph::Graph(int n, const Edges& edges) {
-    this->n = n;
-    m = edges.size();
-    matrix = new int *[n];
-    for (int i = 0; i < n; ++i) {
-        matrix[i] = new int[n];
-        for (int j = 0; j < n; ++j)
-            matrix[i][j] = 0;
-    }
-    for (Edge edge: edges) {
-        matrix[edge.a][edge.b] = 1;
-        matrix[edge.b][edge.a] = 1;
-    }
-    init_adj_list();
-}
-
 Graph::Graph(string &graph6) {
     n = int(graph6[0]) - 63;
     m = 0;
@@ -128,38 +112,6 @@ void Graph::init_adj_list() {
         for (int j = 0; j < n; ++j)
             if (matrix[i][j])
                 adj[i].push_back(j);
-}
-
-void Graph::display() {
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j)
-            printf("%i ", matrix[i][j]);
-        printf("\n");
-    }
-}
-
-string Graph::to_graph6() {
-    string g6(1, char(this->n + 63));
-    uint acc(0), bits(0);
-    for (int j = 0; j < this->n; ++j)
-        for (int i = 0; i < j; ++i) {
-            acc = acc << 1u;
-            acc += this->matrix[i][j];
-            bits++;
-            if (bits == 6) {
-                g6 += char(acc + 63);
-                acc = 0;
-                bits = 0;
-            }
-        }
-    if (bits > 0) {
-        acc <<= (6 - bits);
-        g6 += char(acc + 63);
-    }
-    for (char c: g6)
-        cout << int(c) << ' ';
-    cout << endl;
-    return g6;
 }
 
 Graph::AntimagicResult Graph::is_antimagic(int increment) {

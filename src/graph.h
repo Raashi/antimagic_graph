@@ -43,17 +43,12 @@ struct Graph {
     VecVertices adj;
 
     explicit Graph(string& graph6);
-    Graph(int n, const Edges& edges);
     ~Graph();
 
     Edges get_edges();
     Vertices get_isolated();
 
     void init_adj_list();
-
-    void display();
-
-    string to_graph6();
 
     bool is_connected();
     AntimagicResult is_antimagic(int increment = 0);
