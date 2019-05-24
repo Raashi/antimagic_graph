@@ -11,13 +11,7 @@ int string_to_int(string & value) {
     return stoi(value);
 }
 
-
-double string_to_double(string & value) {
-    return atof(value.c_str()); // NOLINT(cert-err34-c)
-}
-
-
-bool has_arg(int argc, char **argv, string arg) {
+bool has_arg(int argc, char **argv, const string& arg) {
     for (int i = 0; i < argc; ++i) {
         string opt = argv[i];
         if (opt == arg)
@@ -26,8 +20,7 @@ bool has_arg(int argc, char **argv, string arg) {
     return false;
 }
 
-
-string get_arg(int argc, char **argv, string arg, string def) {
+string get_arg(int argc, char **argv, const string& arg, string def) {
     for (int i = 0; i < argc; ++i) {
         string opt = argv[i];
         if (opt == arg) {
@@ -40,8 +33,7 @@ string get_arg(int argc, char **argv, string arg, string def) {
     return def;
 }
 
-
-int get_arg(int argc, char **argv, string arg, int def) {
+int get_arg(int argc, char **argv, const string& arg, int def) {
     string value = get_arg(argc, argv, arg, "");
     if (value.empty())
         return def;
@@ -54,26 +46,10 @@ int get_arg(int argc, char **argv, string arg, int def) {
     }
 }
 
-
 ulong get_arg(int argc, char **argv, string arg, ulong def) {
     int res = get_arg(argc, argv, arg, int(def)); // NOLINT(performance-unnecessary-value-param)
     return ulong(res);
 }
-
-
-double get_arg(int argc, char **argv, string arg, double def) {
-    string value = get_arg(argc, argv, arg, ""); // NOLINT(performance-unnecessary-value-param)
-    if (value.empty())
-        return def;
-
-    try {
-        return string_to_double(value);
-    } catch (runtime_error& error) {
-        puts((ERROR_MSG + "Error when taking argument double-value for '" + arg + "'").c_str());
-        throw runtime_error(ERROR_MSG + error.what());
-    }
-}
-
 
 void write_to_file(const string& filename, vector<string> data) {
     ofstream output_file(filename);

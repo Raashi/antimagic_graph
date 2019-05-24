@@ -25,51 +25,48 @@ Edge::Edge(const int a, const int b) {
 }
 
 bool Edge::operator<(const Edge &right) const {
-    if (this->b != right.b)
-        return this->b < right.b;
+    if (b != right.b)
+        return b < right.b;
     else
-        return this->a < right.a;
+        return a < right.a;
 }
 
-string Edge::to_string() {
-    return "(" + std::to_string(this->a + 1) + " : " + std::to_string(this->b + 1) + ")";
-}
-
-Graph::Graph(int n, Edges edges) {
+Graph::Graph(int n, const Edges& edges) {
     this->n = n;
-    this->m = edges.size();
-    this->matrix = new int *[n];
+    m = edges.size();
+    matrix = new int *[n];
     for (int i = 0; i < n; ++i) {
-        this->matrix[i] = new int[n];
+        matrix[i] = new int[n];
         for (int j = 0; j < n; ++j)
-            this->matrix[i][j] = 0;
+            matrix[i][j] = 0;
     }
     for (Edge edge: edges) {
-        this->matrix[edge.a][edge.b] = 1;
-        this->matrix[edge.b][edge.a] = 1;
+        matrix[edge.a][edge.b] = 1;
+        matrix[edge.b][edge.a] = 1;
     }
+    init_adj_list();
 }
 
 Graph::Graph(string &graph6) {
     // initialization
-    this->n = int(graph6[0]) - 63;
-    this->m = 0;
-    this->matrix = new int *[n];
+    n = int(graph6[0]) - 63;
+    m = 0;
+    matrix = new int *[n];
     for (int i = 0; i < n; ++i) {
-        this->matrix[i] = new int[n];
+        matrix[i] = new int[n];
         // put zeros on main
-        this->matrix[i][i] = 0;
+        matrix[i][i] = 0;
     }
     // parsing
     int row = 0;
     int col = 1;
     for (int i = 1; i < graph6.size(); ++i) {
-        auto isymbol = short(graph6[i]) - 63;
-        for (int ibit = 5; ibit >= 0; --ibit) {
-            int bit = (isymbol >> ibit) & 1;
-            this->matrix[row][col] = bit;
-            this->matrix[col][row] = bit;
-            this->m += bit;
+        uint isymbol = short(graph6[i]) - 63u;
+        for (uint ibit = 5; ibit >= 0; --ibit) {
+            uint bit = (isymbol >> ibit) & 1u;
+            matrix[row][col] = bit;
+            matrix[col][row] = bit;
+            m += bit;
             // update indices
             row++;
             if (row == col) {
@@ -86,28 +83,19 @@ Graph::Graph(string &graph6) {
 }
 
 Graph::~Graph() {
-    for (int i = 0; i < this->n; ++i)
-        delete[] this->matrix[i];
-    delete[] this->matrix;
+    for (int i = 0; i < n; ++i)
+        delete[] matrix[i];
+    delete[] matrix;
 }
 
 Edges Graph::get_edges() {
-    Edges edges = Edges();
-    for (int i = 0; i < this->n; ++i)
-        for (int j = 0; j < i; ++j)
-            if (this->matrix[i][j])
-                edges.emplace_back(i, j);
-    return edges;
-}
-
-Edges Graph::get_divided_edges() {
     Edges edges;
 
-    vector<int> js(this->n, 0);
-    while (edges.size() < this->m) {
-        for (int i = this->n - 1; i >= 0; --i)
+    vector<int> js(n, 0);
+    while (edges.size() < m) {
+        for (int i = n - 1; i >= 0; --i)
             for (int j = js[i]; j < i; ++j) {
-                if (this->matrix[i][j]) {
+                if (matrix[i][j]) {
                     edges.emplace_back(i, j);
                     js[i] += 1;
                     break;
@@ -116,15 +104,6 @@ Edges Graph::get_divided_edges() {
             }
     }
     return edges;
-}
-
-VecVertices Graph::get_adj_list() {
-    VecVertices adj = VecVertices((unsigned long) this->n, Vertices());
-    for (int i = 0; i < this->n; ++i)
-        for (int j = 0; j < this->n; ++j)
-            if (this->matrix[i][j])
-                adj[i].push_back(j);
-    return adj;
 }
 
 Vertices Graph::get_isolated() {
@@ -143,8 +122,13 @@ Vertices Graph::get_isolated() {
 }
 
 void Graph::init_adj_list() {
-    if (adj.empty())
-        adj = get_adj_list();
+    if (!adj.empty())
+        return;
+    adj = VecVertices((unsigned long) n, Vertices());
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            if (matrix[i][j])
+                adj[i].push_back(j);
 }
 
 void Graph::display() {
@@ -157,10 +141,10 @@ void Graph::display() {
 
 string Graph::to_graph6() {
     string g6(1, char(this->n + 63));
-    int acc(0), bits(0);
+    uint acc(0), bits(0);
     for (int j = 0; j < this->n; ++j)
         for (int i = 0; i < j; ++i) {
-            acc <<= 1;
+            acc = acc << 1u;
             acc += this->matrix[i][j];
             bits++;
             if (bits == 6) {
@@ -181,37 +165,37 @@ string Graph::to_graph6() {
 
 uint Graph::is_antimagic(int increment) {
     // 1st optimization: isolated vertices count must be <= 1
-    if (this->get_isolated().size() > 1)
+    if (get_isolated().size() > 1)
         return false;
     // 2nd optimization: if there is K2 connected component in G
     init_adj_list();
-    for (int i = 0; i < this->n; ++i)
+    for (int i = 0; i < n; ++i)
         if (adj[i].size() == 1)
             if (adj[adj[i][0]].size() == 1 && adj[adj[i][0]][0] == i)
                 return false;
 
-    Edges edges = this->get_divided_edges();
+    Edges edges = get_edges();
     PermGen gen(int(edges.size()), true, 200000);
     int *perm = gen.next();
-    map<Edge, int> phi = map<Edge, int>();
-    vector<int> f = vector<int>(this->n, 0);
+    phi_t phi = phi_t();
+    vector<int> f = vector<int>(n, 0);
 
     while (perm != nullptr) {
         for (int i = 0; i < edges.size(); ++i)
             phi[edges[i]] = perm[i] + 1 + increment;  // phi: E -> [1, 2, ..., edges_count]
 
         // calc sum of phi for every vertex
-        for (int i = 0; i < this->n; ++i) {
+        for (int i = 0; i < n; ++i) {
             f[i] = 0;
-            for (int j = 0; j < this->n; ++j)
-                if (this->matrix[i][j])
+            for (int j = 0; j < n; ++j)
+                if (matrix[i][j])
                     f[i] += phi[Edge(i, j)];
         }
 
         // looking for duplicates
         sort(f.begin(), f.end());
         bool antimagic = true;
-        for (int i = 0; i < this->n - 2; ++i)
+        for (int i = 0; i < n - 2; ++i)
             if (f[i] == f[i + 1]) {
                 antimagic = false;
                 break;
@@ -226,31 +210,11 @@ uint Graph::is_antimagic(int increment) {
     return false;
 }
 
-uint Graph::get_distance(Vertex u, Vertex v) {
-    vector<uint> distances(this->n, INFINITE_DISTANCE);
-    distances[u] = 0;
-    queue<Vertex> q;
-    q.push(u);
-
-    while (!q.empty()) {
-        Vertex t = q.front();
-        q.pop();
-        for (Vertex ti = 0; ti < this->n; ++ti)
-            if (this->matrix[t][ti] == 1 && distances[ti] == INFINITE_DISTANCE) {
-                if (ti == v)
-                    return distances[t] + 1;
-                q.push(ti);
-                distances[ti] = distances[t] + 1;
-            }
-    }
-    throw runtime_error("Vertex is unreachable");
-}
-
 vector<uint> Graph::get_all_distances(Vertex u, set<Vertex> *ignored) {
     if (ignored == nullptr)
         ignored = new set<Vertex>();
 
-    vector<uint> distances(this->n, INFINITE_DISTANCE);
+    vector<uint> distances(n, INFINITE_DISTANCE);
     distances[u] = 0;
     queue<Vertex> q;
     q.push(u);
@@ -258,8 +222,8 @@ vector<uint> Graph::get_all_distances(Vertex u, set<Vertex> *ignored) {
     while (!q.empty()) {
         Vertex t = q.front();
         q.pop();
-        for (Vertex ti = 0; ti < this->n; ++ti)
-            if (this->matrix[t][ti] == 1 && distances[ti] == INFINITE_DISTANCE) {
+        for (Vertex ti = 0; ti < n; ++ti)
+            if (matrix[t][ti] == 1 && distances[ti] == INFINITE_DISTANCE) {
                 if (ignored->find(ti) != ignored->end())
                     continue;
                 q.push(ti);
@@ -267,35 +231,6 @@ vector<uint> Graph::get_all_distances(Vertex u, set<Vertex> *ignored) {
             }
     }
     return distances;
-}
-
-Vertices Graph::get_path(Vertex u, Vertex v) {
-    Vertices ancestors(this->n, this->n + 1);
-    ancestors[u] = u;
-    queue<Vertex> q;
-    q.push(u);
-
-    while (!q.empty()) {
-        Vertex t = q.front();
-        if (t == v)
-            break;
-        q.pop();
-        for (Vertex ti = 0; ti < this->n; ++ti)
-            if (this->matrix[t][ti] == 1 && ancestors[ti] == this->n + 1) {
-                q.push(ti);
-                ancestors[ti] = t;
-            }
-    }
-
-    Vertices path;
-    path.push_back(v);
-    Vertex cur = v;
-    while (ancestors[cur] != cur) {
-        path.push_back(ancestors[cur]);
-        cur = ancestors[cur];
-    }
-    reverse(path.begin(), path.end());
-    return path;
 }
 
 bool Graph::is_connected() {

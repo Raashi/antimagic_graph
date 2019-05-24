@@ -21,7 +21,6 @@ struct Edge {
     int a, b;
 
     Edge(int a, int b);
-    string to_string();
 
     bool operator < (const Edge& a) const;
 };
@@ -38,15 +37,13 @@ struct Graph {
     VecVertices adj;
 
     explicit Graph(string& graph6);
-    Graph(int n, Edges edges);
+    Graph(int n, const Edges& edges);
     ~Graph();
 
     Edges get_edges();
-    Edges get_divided_edges();
     Vertices get_isolated();
 
     void init_adj_list();
-    VecVertices get_adj_list();
 
     void display();
 
@@ -55,8 +52,6 @@ struct Graph {
     bool is_connected();
     uint is_antimagic(int increment = 0);
 
-    uint get_distance(Vertex, Vertex);
-    Vertices get_path(Vertex, Vertex);
     vector<uint> get_all_distances(Vertex, set<Vertex>* = nullptr);
 };
 

@@ -10,17 +10,17 @@ StrongAntimagicBruteParams::StrongAntimagicBruteParams(AntimagicBruteParams *abp
 
 void StrongAntimagicBruteParams::print_stat(bool same_line) {
     printf("\rChecked: %i Not strong antimagic: %i%s",
-           (int) this->abp->checked,
-           (int) this->abp->non_antimagic,
+           (int) abp->checked,
+           (int) abp->non_antimagic,
            same_line ? "" : "\n");
 }
 
 void StrongAntimagicBruteParams::print_stat_inline() {
-    if (this->abp->checked % 10 == 0) {
-        this->abp->mutex_print.lock();
-        this->print_stat(true);
+    if (abp->checked % 10 == 0) {
+        abp->mutex_print.lock();
+        print_stat(true);
         fflush(stdout);
-        this->abp->mutex_print.unlock();
+        abp->mutex_print.unlock();
     }
 }
 
