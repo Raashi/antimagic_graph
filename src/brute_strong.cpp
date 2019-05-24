@@ -40,7 +40,7 @@ uint worker_strong_antimagic(void* arg, string line) {
 
     bool is_strong_antimagic = true;
     for (int increment = 0; increment <= sabp->increment_max; ++increment)
-        if (!g.is_antimagic(increment)) {
+        if (!g.is_antimagic(increment).antimagic) {
             is_strong_antimagic = false;
             break;
         }

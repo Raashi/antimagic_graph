@@ -162,16 +162,16 @@ string Graph::to_graph6() {
     return g6;
 }
 
-uint Graph::is_antimagic(int increment) {
+Graph::AntimagicResult Graph::is_antimagic(int increment) {
     // 1st optimization: isolated vertices count must be <= 1
     if (get_isolated().size() > 1)
-        return false;
+        return AntimagicResult{false, true};
     // 2nd optimization: if there is K2 connected component in G
     init_adj_list();
     for (int i = 0; i < n; ++i)
         if (adj[i].size() == 1)
             if (adj[adj[i][0]].size() == 1 && adj[adj[i][0]][0] == i)
-                return false;
+                return AntimagicResult{false, true};
 
     Edges edges = get_edges();
     PermGen gen(int(edges.size()), true, RANDOM_PERMUTATIONS_COUNT);
@@ -202,11 +202,11 @@ uint Graph::is_antimagic(int increment) {
 
         // return true if antimagic phi was found
         if (antimagic)
-            return true;
+            return AntimagicResult{true, false};
         perm = gen.next();
     }
     // return false if antimagic phi was never found
-    return false;
+    return AntimagicResult{false, false};
 }
 
 vector<uint> Graph::get_all_distances(Vertex u, set<Vertex> *ignored) {

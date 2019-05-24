@@ -34,10 +34,10 @@ uint worker_antimagic(void* arg, string line) {
     if (bp->check_only_not_connected && !connected)
         return WORKER_RETURN_OKAY;
 
-    bool antimagic = g.is_antimagic();
+    Graph::AntimagicResult result = g.is_antimagic();
     bp->checked++;
 
-    if (antimagic) {
+    if (result.antimagic) {
         bp->antimagic++;
         connected ? bp->connected_antimagic++ : bp->not_connected_antimagic++;
     }

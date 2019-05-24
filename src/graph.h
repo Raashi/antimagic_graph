@@ -32,6 +32,11 @@ typedef map<Edge, uint> phi_t;
 
 
 struct Graph {
+    struct AntimagicResult {
+        bool antimagic;
+        bool optimized;
+    };
+
     int n;
     int m;
     int** matrix;
@@ -51,7 +56,7 @@ struct Graph {
     string to_graph6();
 
     bool is_connected();
-    uint is_antimagic(int increment = 0);
+    AntimagicResult is_antimagic(int increment = 0);
 
     vector<uint> get_all_distances(Vertex, set<Vertex>* = nullptr);
 };
