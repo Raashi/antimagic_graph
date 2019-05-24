@@ -2,6 +2,7 @@
 #define ANTIMAGIC_PERMS_H
 
 #include <vector>
+#include <random>
 
 using namespace std;
 
@@ -12,6 +13,8 @@ struct PermGen {
     int* free;
     int* perm;
     bool start;
+
+    mt19937_64 g;
 
     bool randomize;
     int rand_count;
@@ -24,7 +27,8 @@ struct PermGen {
 
     ~PermGen();
 
-    void display_last();
+private:
+    void assign_generator();
 };
 
 #endif //ANTIMAGIC_PERMS_H

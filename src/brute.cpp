@@ -79,7 +79,7 @@ void worker_antimagic_finalize(void* arg) {
 }
 
 void AntimagicBruteParams::print_stat_inline() {
-    if (this->checked % 100 == 0) {
+    if (this->checked % 10000 == 0) {
         this->mutex_print.lock();
         this->print_stat(true);
         fflush(stdout);

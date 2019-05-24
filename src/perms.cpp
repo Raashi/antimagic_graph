@@ -3,6 +3,7 @@
 #include <chrono>
 #include <algorithm>
 #include <random>
+#include <functional>
 
 #include "perms.h"
 
@@ -11,75 +12,76 @@ using namespace std;
 
 PermGen::PermGen(int n, bool randomize, int rand_count) {
     this->n = n;
-    this->depth = n - 1;
-    this->free = new int[n];
-    this->perm = new int[n];
+    depth = n - 1;
+    free = new int[n];
+    perm = new int[n];
     for (int i = 0; i < n; ++i) {
-        this->free[i] = false;
-        this->perm[i] = i;
+        free[i] = false;
+        perm[i] = i;
     }
-    this->start = true;
+    start = true;
 
     this->randomize = randomize;
     this->rand_count = rand_count;
-    this->rand_i = 0;
+    rand_i = 0;
     for (int i = 0; i < this->n; ++i)
-        this->perm_rand.push_back(i);
-    this->perm_rand_arr = new int[n];
+        perm_rand.push_back(i);
+    perm_rand_arr = new int[n];
+    assign_generator();
 }
 
 
 int* PermGen::next() {
-    if (this->start) {
-        this->start = false;
-        return this->perm;
+    if (start) {
+        start = false;
+        return perm;
     }
 
-    if (this->randomize && this->rand_i < this->rand_count) {
-        this->rand_i++;
-        for (int i = 0; i < this->n; ++i)
-            this->perm_rand[i] = i;
-        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-        shuffle(this->perm_rand.begin(), this->perm_rand.end(), mt19937(seed)); // default_random_engine(seed));
-        for (int i = 0; i < this->n; ++i)
+    if (randomize && rand_i < rand_count) {
+        rand_i++;
+//        if (rand_i % 10000 == 0)
+//            assign_generator();
+        for (int i = 0; i < n; ++i)
+            perm_rand[i] = i;
+        shuffle(perm_rand.begin(), perm_rand.end(), g); // default_random_engine(seed));
+        for (int i = 0; i < n; ++i)
             perm_rand_arr[i] = perm_rand[i];
         return perm_rand_arr;
     }
 
-    while (0 <= this->depth && this->depth < this->n) {
-        if (this->perm[this->depth] >= 0)
-            this->free[this->perm[this->depth]] = true;
-        this->perm[this->depth]++;
+    while (0 <= depth && depth < n) {
+        if (perm[depth] >= 0)
+            free[perm[depth]] = true;
+        perm[depth]++;
 
         bool go_up = false;
-        while (this->perm[this->depth] < this->n) {
-            if (this->free[this->perm[this->depth]]) {
-                this->free[this->perm[this->depth]] = false;
-                this->depth++;
+        while (perm[depth] < n) {
+            if (free[perm[depth]]) {
+                free[perm[depth]] = false;
+                depth++;
                 go_up = true;
                 break;
             }
-            this->perm[this->depth]++;
+            perm[depth]++;
         }
         if (!go_up) {
-            this->perm[this->depth] = -1;
-            this->depth--;
+            perm[depth] = -1;
+            depth--;
         }
     }
-    if (this->depth == this->n) {
-        this->depth--;
-        return this->perm;
+    if (depth == n) {
+        depth--;
+        return perm;
     } else
         return nullptr;
 }
 
 PermGen::~PermGen() {
-    delete [] this->free;
-    delete [] this->perm;
-    delete [] this->perm_rand_arr;
+    delete [] free;
+    delete [] perm;
+    delete [] perm_rand_arr;
 }
 
-void PermGen::display_last() {
-    for (int i = 0; i < this->n; ++i)
-        printf("%i, ", this->perm[i]);
+void PermGen::assign_generator() {
+    g = mt19937_64(chrono::system_clock::now().time_since_epoch().count());
 }
