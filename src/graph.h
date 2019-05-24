@@ -10,24 +10,25 @@
 using namespace std;
 
 
-typedef int Vertex;
+typedef uint Vertex;
 typedef vector<Vertex> Vertices;
 typedef vector<Vertices> VecVertices;
 
 const uint INFINITE_DISTANCE = UINT_MAX;
+const uint RANDOM_PERMUTATIONS_COUNT = 200000u;
 
 
 struct Edge {
-    int a, b;
+    Vertex a, b;
 
-    Edge(int a, int b);
+    Edge(Vertex a, Vertex b);
 
     bool operator < (const Edge& a) const;
 };
 typedef vector<Edge> Edges;
 
 
-typedef map<Edge, int> phi_t;
+typedef map<Edge, uint> phi_t;
 
 
 struct Graph {

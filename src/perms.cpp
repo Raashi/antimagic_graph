@@ -6,13 +6,14 @@
 #include <functional>
 
 #include "perms.h"
+#include "utils.h"
 
 using namespace std;
 
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cert-msc32-c"
-PermGen::PermGen(int n, bool randomize, int rand_count) {
+PermGen::PermGen(int n, bool randomize, uint rand_count) {
     this->n = n;
     depth = n - 1;
     free = new int[n];

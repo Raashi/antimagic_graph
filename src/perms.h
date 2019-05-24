@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <random>
+#include "utils.h"
 
 using namespace std;
 
@@ -17,12 +18,12 @@ struct PermGen {
     mt19937_64 g;
 
     bool randomize;
-    int rand_count;
-    int rand_i;
+    uint rand_count;
+    uint rand_i;
     vector<int> perm_rand;
     int* perm_rand_arr;
 
-    explicit PermGen(int n, bool randomize, int rand_count);
+    explicit PermGen(int n, bool randomize, uint rand_count);
     int* next();
 
     ~PermGen();

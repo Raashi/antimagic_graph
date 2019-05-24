@@ -14,7 +14,7 @@
 using namespace std;
 
 
-Edge::Edge(const int a, const int b) {
+Edge::Edge(const Vertex a, const Vertex b) {
     if (a < b) {
         this->a = a;
         this->b = b;
@@ -174,10 +174,10 @@ uint Graph::is_antimagic(int increment) {
                 return false;
 
     Edges edges = get_edges();
-    PermGen gen(int(edges.size()), true, 200000);
+    PermGen gen(int(edges.size()), true, RANDOM_PERMUTATIONS_COUNT);
     int *perm = gen.next();
     phi_t phi = phi_t();
-    vector<int> f = vector<int>(n, 0);
+    vector<uint> f = vector<uint>(n, 0);
 
     while (perm != nullptr) {
         for (int i = 0; i < edges.size(); ++i)
