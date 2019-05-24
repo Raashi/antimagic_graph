@@ -6,7 +6,6 @@
 #include <vector>
 #include <string>
 
-#include "threads.h"
 #include "utils.h"
 
 
@@ -32,10 +31,9 @@ struct AntimagicBruteParams {
 
     void print_stat(bool same_line);
     void print_stat_inline();
+
+    uint worker(string);
+    void finalize();
 };
-
-
-uint worker_antimagic(void*, string);
-void worker_antimagic_finalize(void*);
 
 #endif //ANTIMAGIC_BRUTE_H

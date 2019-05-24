@@ -5,14 +5,35 @@
 #include <vector>
 #include <random>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <process.h>
+#else
+#include <pthread.h>
+#endif
+
 using namespace std;
 
 typedef unsigned int uint;
 typedef unsigned long ulong;
 
-
 const string SYS_MSG   = "[ SYS ] "; // NOLINT(cert-err58-cpp)
 const string ERROR_MSG = "[ERROR] "; // NOLINT(cert-err58-cpp)
+
+struct Mutex {
+#ifdef _WIN32
+    CRITICAL_SECTION cs{};
+#else
+    pthread_mutex_t mutex{};
+#endif
+
+    Mutex ();
+    ~Mutex();
+
+    void lock();
+    void unlock();
+};
+
 
 int string_to_int(string &);
 

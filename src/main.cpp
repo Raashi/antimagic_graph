@@ -17,10 +17,8 @@ int main(int argc, char **argv) {
         throw runtime_error("Wrong arguments");
 
     ifstream file(argv[1]);
-
     ThreadPull tp{argc, argv, &file};
-    AntimagicBruteParams abp;
-    tp.run(worker_antimagic, (void*) &abp, worker_antimagic_finalize);
+    tp.run();
     file.close();
 
     return 0;
