@@ -48,7 +48,6 @@ Graph::Graph(int n, const Edges& edges) {
 }
 
 Graph::Graph(string &graph6) {
-    // initialization
     n = int(graph6[0]) - 63;
     m = 0;
     matrix = new int *[n];
@@ -61,8 +60,8 @@ Graph::Graph(string &graph6) {
     int row = 0;
     int col = 1;
     for (int i = 1; i < graph6.size(); ++i) {
-        uint isymbol = short(graph6[i]) - 63u;
-        for (uint ibit = 5; ibit >= 0; --ibit) {
+        uint isymbol = uint(graph6[i]) - 63u;
+        for (uint ibit = 5; ibit <= 5; --ibit) {
             uint bit = (isymbol >> ibit) & 1u;
             matrix[row][col] = bit;
             matrix[col][row] = bit;
@@ -132,9 +131,9 @@ void Graph::init_adj_list() {
 }
 
 void Graph::display() {
-    for (int i = 0; i < this->n; ++i) {
-        for (int j = 0; j < this->n; ++j)
-            printf("%i ", this->matrix[i][j]);
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j)
+            printf("%i ", matrix[i][j]);
         printf("\n");
     }
 }
