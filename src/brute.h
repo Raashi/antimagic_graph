@@ -8,6 +8,8 @@
 
 #include "utils.h"
 
+const int ITERATIONS_PRINT_INTERVAL = 10000;
+
 
 struct AntimagicBruteParams {
     atomic_long checked{0};
@@ -26,7 +28,6 @@ struct AntimagicBruteParams {
     Mutex mutex_print;
 
     vector<string> vec_not_optimized;
-    vector<string> vec_not_antimagic;
     Mutex mutex_vec;
 
     void print_stat(bool same_line);

@@ -16,7 +16,7 @@
 
 
 void AntimagicBruteParams::print_stat_inline() {
-    if (checked % 10000 == 0) {
+    if (checked % ITERATIONS_PRINT_INTERVAL == 0) {
         mutex_print.lock();
         print_stat(true);
         fflush(stdout);
@@ -52,9 +52,6 @@ uint AntimagicBruteParams::worker(string line) {
             vec_not_optimized.push_back(line);
             mutex_vec.unlock();
         }
-//        bp->mutex_vec.lock();
-//        bp->vec_not_antimagic.push_back(line);
-//        bp->mutex_vec.unlock();
     }
 
     print_stat_inline();
@@ -79,6 +76,4 @@ void AntimagicBruteParams::finalize() {
     printf("Not antimagic and not optimized: %ld\n", (long) not_antimagic_not_optimized);
     if (!vec_not_optimized.empty())
         write_to_file("not_antimagic_not_optimized.txt", vec_not_optimized);
-//    if (!bp->vec_not_antimagic.empty())
-//        write_to_file("not_antimagic.txt", bp->vec_not_antimagic);
 }
