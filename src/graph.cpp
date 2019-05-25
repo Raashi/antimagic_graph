@@ -127,13 +127,12 @@ Graph::AntimagicResult Graph::is_antimagic(int increment) {
 
     Edges edges = get_edges();
     PermGen gen(int(edges.size()), true, RANDOM_PERMUTATIONS_COUNT);
-    int *perm = gen.next();
     phi_t phi = phi_t();
     vector<uint> f = vector<uint>(n, 0);
 
-    while (perm != nullptr) {
+    while (gen.next()) {
         for (int i = 0; i < edges.size(); ++i)
-            phi[edges[i]] = perm[i] + 1 + increment;  // phi: E -> [1, 2, ..., edges_count]
+            phi[edges[i]] = gen.perm.at(i) + 1 + increment;  // phi: E -> [1, 2, ..., edges_count]
 
         // calc sum of phi for every vertex
         for (int i = 0; i < n; ++i) {
@@ -155,7 +154,6 @@ Graph::AntimagicResult Graph::is_antimagic(int increment) {
         // return true if antimagic phi was found
         if (antimagic)
             return AntimagicResult{true, false};
-        perm = gen.next();
     }
     // return false if antimagic phi was never found
     return AntimagicResult{false, false};
