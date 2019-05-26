@@ -14,6 +14,7 @@ using namespace std;
 struct AntimagicBruteParams {
     atomic_long checked{0};
     atomic_long antimagic{0};
+    atomic_long antimagic_randomized{0};
     atomic_long not_antimagic{0};
     atomic_long not_antimagic_not_optimized{0};
 

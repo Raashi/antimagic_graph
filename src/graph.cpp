@@ -117,19 +117,20 @@ void Graph::init_adj_list() {
 Graph::AntimagicResult Graph::is_antimagic(int increment) {
     // 1st optimization: isolated vertices count must be <= 1
     if (get_isolated().size() > 1)
-        return AntimagicResult{false, true};
+        return AntimagicResult{false, true, false};
     // 2nd optimization: if there is K2 connected component in G
     init_adj_list();
     for (int i = 0; i < n; ++i)
         if (adj[i].size() == 1)
             if (adj[adj[i][0]].size() == 1 && adj[adj[i][0]][0] == i)
-                return AntimagicResult{false, true};
+                return AntimagicResult{false, true, false};
 
     Edges edges = get_edges();
     PermGen gen(int(edges.size()), true, RANDOM_PERMUTATIONS_COUNT);
     phi_t phi = phi_t();
     vector<uint> f = vector<uint>(n, 0);
 
+    ulong iteration = 0;
     while (gen.next()) {
         for (int i = 0; i < edges.size(); ++i)
             phi[edges[i]] = gen.perm.at(i) + 1 + increment;  // phi: E -> [1, 2, ..., edges_count]
@@ -153,10 +154,11 @@ Graph::AntimagicResult Graph::is_antimagic(int increment) {
 
         // return true if antimagic phi was found
         if (antimagic)
-            return AntimagicResult{true, false};
+            return AntimagicResult{true, false, iteration < RANDOM_PERMUTATIONS_COUNT};
+        iteration++;
     }
     // return false if antimagic phi was never found
-    return AntimagicResult{false, false};
+    return AntimagicResult{false, false, false};
 }
 
 vector<uint> Graph::get_all_distances(Vertex u) {

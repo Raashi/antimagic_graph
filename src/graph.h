@@ -35,6 +35,7 @@ struct Graph {
     struct AntimagicResult {
         bool antimagic;
         bool optimized;
+        bool randomized;
     };
 
     int n;

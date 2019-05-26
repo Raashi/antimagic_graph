@@ -27,6 +27,8 @@ void AntimagicBruteParams::worker(string line) {
     if (result.antimagic) {
         antimagic++;
         is_connected ? connected_antimagic++ : not_connected_antimagic++;
+        if (result.randomized)
+            antimagic_randomized++;
     } else {
         not_antimagic++;
         is_connected ? connected_not_antimagic++ : not_connected_not_antimagic++;
@@ -40,8 +42,13 @@ void AntimagicBruteParams::worker(string line) {
 }
 
 void AntimagicBruteParams::finalize() {
-    printf("Checked: %ld Non-antimagic: %ld\n",
+    printf("All graph checked count: %ld\n"
+           "Antimagic: %ld\n"
+           "Antimagic randomized: %ld\n"
+           "Non-antimagic: %ld\n",
            (long) checked,
+           (long) antimagic,
+           (long) antimagic_randomized,
            (long) not_antimagic);
     printf("Connected all: %ld\n"
            "Connected and antimagic: %ld\n"
