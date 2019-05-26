@@ -84,7 +84,7 @@ void ThreadPull::run() {
 
 #ifdef _WIN32
     cout << SYS_MSG << "Launching windows threads..." << endl;
-    cout << SYS_MSG << "Process: 0%";
+    cout << SYS_MSG << "Progress: 0%";
     HANDLE threads[this->thread_count];
     for (int i = 0; i < this->thread_count; ++i) {
         auto thread = (HANDLE) _beginthreadex(nullptr, 0, windows_worker, (void*) this, 0, nullptr);
@@ -108,7 +108,7 @@ void ThreadPull::run() {
     }
 #endif
 
-    printf("\r%sProgress: %i%%\n", SYS_MSG.c_str(), (int) progress);
+    printf("\r%sProgress: 100%%\n", SYS_MSG.c_str());
     abp.finalize();
 
     time(&end);

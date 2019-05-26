@@ -16,6 +16,7 @@ using namespace std;
 
 typedef unsigned int uint;
 typedef unsigned long ulong;
+typedef unsigned long long ullong;
 
 const string SYS_MSG   = "[ SYS ] "; // NOLINT(cert-err58-cpp)
 const string ERROR_MSG = "[ERROR] "; // NOLINT(cert-err58-cpp)
@@ -37,14 +38,13 @@ struct Mutex {
 
 int string_to_int(string &);
 
-bool has_arg(int argc, char **argv, const string& arg);
-
 string get_arg(int, char **, const string&, string /* default */);
 int    get_arg(int, char **, const string&, int);
 uint   get_arg(int, char **, const string&, uint);
 
 void write_to_file(const string&, vector<string>);
 
-ulong get_graph_count(string filename);
+ullong get_file_size(const char *filename);
+ullong get_graph_count(char* filename);
 
 #endif //ANTIMAGIC_UTILS_H

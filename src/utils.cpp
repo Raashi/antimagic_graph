@@ -39,20 +39,11 @@ void Mutex::unlock() {
 #endif
 }
 
-int string_to_int(string & value) {
+int string_to_int(string &value) {
     return stoi(value);
 }
 
-bool has_arg(int argc, char **argv, const string& arg) {
-    for (int i = 0; i < argc; ++i) {
-        string opt = argv[i];
-        if (opt == arg)
-            return true;
-    }
-    return false;
-}
-
-string get_arg(int argc, char **argv, const string& arg, string def) {
+string get_arg(int argc, char **argv, const string &arg, string def) {
     for (int i = 0; i < argc; ++i) {
         string opt = argv[i];
         if (opt == arg) {
@@ -65,39 +56,51 @@ string get_arg(int argc, char **argv, const string& arg, string def) {
     return def;
 }
 
-int get_arg(int argc, char **argv, const string& arg, int def) {
+int get_arg(int argc, char **argv, const string &arg, int def) {
     string value = get_arg(argc, argv, arg, "");
     if (value.empty())
         return def;
     try {
         return string_to_int(value);
-    } catch (runtime_error& error) {
+    } catch (runtime_error &error) {
         puts((ERROR_MSG + "Error when taking argument int-value for '" + arg + "'").c_str());
         throw runtime_error(ERROR_MSG + error.what());
     }
 }
 
-uint get_arg(int argc, char **argv, const string& arg, uint def) {
+uint get_arg(int argc, char **argv, const string &arg, uint def) {
     int res = get_arg(argc, argv, arg, int(def));
     return ulong(res);
 }
 
-void write_to_file(const string& filename, vector<string> data) {
+void write_to_file(const string &filename, vector<string> data) {
     ofstream output_file(filename);
     ostream_iterator<string> output_iterator(output_file, "\n");
     copy(data.begin(), data.end(), output_iterator);
 }
 
-ulong get_file_size(string filename) {
-    struct stat64 stat_buf{};
-    int rc = stat64(filename.c_str(), &stat_buf);
-    return rc == 0 ? stat_buf.st_size : -1;
+ullong get_file_size(const char *filename) {
+#ifdef _WIN32
+    WIN32_FILE_ATTRIBUTE_DATA file_info;
+    if (!GetFileAttributesEx(filename, GetFileExInfoStandard, (void *) &file_info))
+        return -1;
+    uint32_t hi = file_info.nFileSizeHigh, lo = file_info.nFileSizeLow;
+    uint64_t file_size = (static_cast<uint64_t>(hi) << 32ull) | lo;
+    return file_size;
+#else
+    struct stat stat_buf{};
+    FILE* fp = fopen(filename, "rb");
+    int rc = fstat(fileno(fp), &stat_buf);
+    ulong res = stat_buf.st_size;
+    fclose(fp);
+    return res;
+#endif
 }
 
-ulong get_graph_count(string filename) {
-    ulong file_size = get_file_size(filename);
+ullong get_graph_count(char *filename) {
+    ullong file_size = get_file_size(filename);
     ifstream file(filename);
     string first_line;
     getline(file, first_line);
-    return file_size / (first_line.length() + 1);
+    return file_size / (static_cast<uint64_t>(first_line.length()) + 1ull);
 }
