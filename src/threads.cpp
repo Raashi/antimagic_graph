@@ -2,6 +2,9 @@
 #include <time.h>
 #include <iterator>
 #include <thread>
+#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "threads.h"
 
@@ -13,22 +16,28 @@ void exit_thread(int ret_val) {
 #endif
 }
 
-ThreadPull::ThreadPull(int argc, char **argv, ifstream* fp) {
-    this->fp = fp;
-    thread_count = get_arg(argc, argv, "-tc", DEFAULT_THREAD_COUNT);
+ThreadPull::ThreadPull(uint thread_count, char *filename) {
+    fp = ifstream(filename);
+    graph_count = get_graph_count(filename);
+    graph_print_count = max(graph_count / 100, 10ul);
+    this->thread_count = thread_count;
     cout << SYS_MSG << "Thread count set to " << thread_count << endl;
 }
 
-uint main_worker(void* arg) {
-    auto * thread_pull = (ThreadPull*) arg;
-    AntimagicBruteParams* params = &(thread_pull->abp);
+ThreadPull::~ThreadPull() {
+    fp.close();
+}
+
+uint main_worker(void *arg) {
+    auto *thread_pull = (ThreadPull *) arg;
+    AntimagicBruteParams *params = &(thread_pull->abp);
 
     string line;
 
     do {
         bool leave = false;
         thread_pull->mutex.lock();
-        if (not (bool) getline(*(thread_pull->fp), line))
+        if (not(bool) getline(thread_pull->fp, line))
             leave = true;
         thread_pull->mutex.unlock();
         if (leave) {
@@ -36,11 +45,23 @@ uint main_worker(void* arg) {
             return 0;
         }
 
-        uint ret_val = params->worker(line);
+        params->worker(line);
 
-        thread_pull->data_read++;
-        if (ret_val == WORKER_RETURN_OKAY)
-            thread_pull->data_okay++;
+        thread_pull->graph_read_count++;
+        if (thread_pull->graph_read_count % thread_pull->graph_print_count == 0) {
+            double graph_read_count = (long) thread_pull->graph_read_count;
+            double graph_count = 1.0 / (long) thread_pull->graph_count;
+            int progress = (int) round(graph_read_count * graph_count * 100);
+            thread_pull->mutex_progress.lock();
+            if (progress <= thread_pull->progress) {
+                thread_pull->mutex_progress.unlock();
+                continue;
+            }
+            thread_pull->progress = progress;
+            printf("\rProgress: %i%%", progress);
+            fflush(stdout);
+            thread_pull->mutex_progress.unlock();
+        }
     } while (true);
 }
 
@@ -49,9 +70,11 @@ uint __stdcall windows_worker(void* arg) {
     return main_worker(arg);
 }
 #else
-void* posix_worker(void* arg) {
+
+void *posix_worker(void *arg) {
     return new int(main_worker(arg));
 }
+
 #endif
 
 void ThreadPull::run() {
@@ -82,6 +105,7 @@ void ThreadPull::run() {
     }
 #endif
 
+    printf("\rProgress: %i%%\n", (int) progress);
     abp.finalize();
 
     time(&end);

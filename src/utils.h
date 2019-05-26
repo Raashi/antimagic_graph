@@ -41,8 +41,10 @@ bool has_arg(int argc, char **argv, const string& arg);
 
 string get_arg(int, char **, const string&, string /* default */);
 int    get_arg(int, char **, const string&, int);
-ulong  get_arg(int, char **, string, ulong);
+uint   get_arg(int, char **, const string&, uint);
 
 void write_to_file(const string&, vector<string>);
+
+ulong get_graph_count(string filename);
 
 #endif //ANTIMAGIC_UTILS_H

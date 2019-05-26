@@ -19,21 +19,25 @@
 using namespace std;
 
 
-const uint   WORKER_RETURN_OKAY   = 0;
-const ulong  DEFAULT_THREAD_COUNT = 4;
+const uint DEFAULT_THREAD_COUNT = 4;
 
 struct ThreadPull {
-    atomic_int data_read{0};
-    atomic_int data_okay{0};
-
     Mutex mutex;
+    Mutex mutex_progress;
 
-    ifstream* fp;
-    ulong thread_count;
+    ifstream fp;
+    uint thread_count;
 
+    ulong graph_count;
+    ulong graph_print_count;
+    atomic_long graph_read_count{0};
+    int progress{0};
     AntimagicBruteParams abp;
 
-    ThreadPull(int, char**, ifstream*);
+    ThreadPull(uint, char *);
+
+    ~ThreadPull();
+
     void run();
 };
 

@@ -15,23 +15,7 @@
 #include "threads.h"
 
 
-void AntimagicBruteParams::print_stat_inline() {
-    if (checked % ITERATIONS_PRINT_INTERVAL == 0) {
-        mutex_print.lock();
-        print_stat(true);
-        fflush(stdout);
-        mutex_print.unlock();
-    }
-}
-
-void AntimagicBruteParams::print_stat(bool same_line) {
-    printf("\rChecked: %ld Non-antimagic: %ld %s",
-           (long) checked,
-           (long) not_antimagic,
-           same_line ? "" : "\n");
-}
-
-uint AntimagicBruteParams::worker(string line) {
+void AntimagicBruteParams::worker(string line) {
     Graph g(line);
 
     bool is_connected = g.is_connected();
@@ -53,14 +37,12 @@ uint AntimagicBruteParams::worker(string line) {
             mutex_vec.unlock();
         }
     }
-
-    print_stat_inline();
-
-    return WORKER_RETURN_OKAY;
 }
 
 void AntimagicBruteParams::finalize() {
-    print_stat(false);
+    printf("Checked: %ld Non-antimagic: %ld\n",
+           (long) checked,
+           (long) not_antimagic);
     printf("Connected all: %ld\n"
            "Connected and antimagic: %ld\n"
            "Connected and not antimagic: %ld\n",

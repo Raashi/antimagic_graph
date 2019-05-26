@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iterator>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #include "utils.h"
 
@@ -68,7 +69,6 @@ int get_arg(int argc, char **argv, const string& arg, int def) {
     string value = get_arg(argc, argv, arg, "");
     if (value.empty())
         return def;
-
     try {
         return string_to_int(value);
     } catch (runtime_error& error) {
@@ -77,8 +77,8 @@ int get_arg(int argc, char **argv, const string& arg, int def) {
     }
 }
 
-ulong get_arg(int argc, char **argv, string arg, ulong def) {
-    int res = get_arg(argc, argv, arg, int(def)); // NOLINT(performance-unnecessary-value-param)
+uint get_arg(int argc, char **argv, const string& arg, uint def) {
+    int res = get_arg(argc, argv, arg, int(def));
     return ulong(res);
 }
 
@@ -86,4 +86,18 @@ void write_to_file(const string& filename, vector<string> data) {
     ofstream output_file(filename);
     ostream_iterator<string> output_iterator(output_file, "\n");
     copy(data.begin(), data.end(), output_iterator);
+}
+
+ulong get_file_size(string filename) {
+    struct stat64 stat_buf{};
+    int rc = stat64(filename.c_str(), &stat_buf);
+    return rc == 0 ? stat_buf.st_size : -1;
+}
+
+ulong get_graph_count(string filename) {
+    ulong file_size = get_file_size(filename);
+    ifstream file(filename);
+    string first_line;
+    getline(file, first_line);
+    return file_size / (first_line.length() + 1);
 }
