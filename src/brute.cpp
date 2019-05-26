@@ -27,8 +27,10 @@ void AntimagicBruteParams::worker(string line) {
     if (result.antimagic) {
         antimagic++;
         is_connected ? connected_antimagic++ : not_connected_antimagic++;
-        if (result.randomized)
+        if (result.randomized) {
             antimagic_randomized++;
+            antimagic_randomized_iterations += result.iterations;
+        }
     } else {
         not_antimagic++;
         is_connected ? connected_not_antimagic++ : not_connected_not_antimagic++;
@@ -42,26 +44,35 @@ void AntimagicBruteParams::worker(string line) {
 }
 
 void AntimagicBruteParams::finalize() {
-    printf("All graph checked count: %ld\n"
-           "Antimagic: %ld\n"
-           "Antimagic randomized: %ld\n"
-           "Non-antimagic: %ld\n",
-           (long) checked,
+    cout << SEPARATOR << endl;
+    printf("All graph checked count : %ld\n", (long) checked);
+    cout << SEPARATOR << endl;
+    printf("Antimagic     : %ld\n"
+           "Non-antimagic : %ld\n",
            (long) antimagic,
-           (long) antimagic_randomized,
            (long) not_antimagic);
-    printf("Connected all: %ld\n"
-           "Connected and antimagic: %ld\n"
-           "Connected and not antimagic: %ld\n",
+    cout << SEPARATOR << endl;
+    printf("Antimagic randomized   : %ld\n"
+           "Mean random iterations : %.2lf\n",
+           (long) antimagic_randomized,
+           (double) antimagic_randomized_iterations / antimagic_randomized);
+    cout << SEPARATOR << endl;
+    printf("Connected:\n"
+           "   all           : %ld\n"
+           "   antimagic     : %ld\n"
+           "   not antimagic : %ld\n",
            (long) connected,
            (long) connected_antimagic,
            (long) connected_not_antimagic);
-    printf("Not connected: %ld\n"
-           "Not connected and antimagic: %ld\n"
-           "Not connected and not antimagic: %ld\n",
+    cout << SEPARATOR << endl;
+    printf("Not connected:\n"
+           "   all           : %ld\n"
+           "   antimagic     : %ld\n"
+           "   not antimagic : %ld\n",
            (long) not_connected,
            (long) not_connected_antimagic,
            (long) not_connected_not_antimagic);
+    cout << SEPARATOR << endl;
     printf("Not antimagic and not optimized: %ld\n", (long) not_antimagic_not_optimized);
     if (!vec_not_optimized.empty())
         write_to_file("not_antimagic_not_optimized.txt", vec_not_optimized);

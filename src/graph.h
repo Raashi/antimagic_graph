@@ -15,7 +15,7 @@ typedef vector<Vertex> Vertices;
 typedef vector<Vertices> VecVertices;
 
 const uint INFINITE_DISTANCE = UINT_MAX;
-const uint RANDOM_PERMUTATIONS_COUNT = 2000000u;
+const uint RANDOM_PERMUTATIONS_COUNT = 1000u;
 
 
 struct Edge {
@@ -36,6 +36,7 @@ struct Graph {
         bool antimagic;
         bool optimized;
         bool randomized;
+        uint iterations;
     };
 
     int n;

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iomanip>
 
 #include "threads.h"
 
@@ -58,7 +59,7 @@ uint main_worker(void *arg) {
                 continue;
             }
             thread_pull->progress = progress;
-            printf("\rProgress: %i%%", progress);
+            printf("\r%sProgress: %i%%", SYS_MSG.c_str(), progress);
             fflush(stdout);
             thread_pull->mutex_progress.unlock();
         }
@@ -83,6 +84,7 @@ void ThreadPull::run() {
 
 #ifdef _WIN32
     cout << SYS_MSG << "Launching windows threads..." << endl;
+    cout << SYS_MSG << "Process: 0%";
     HANDLE threads[this->thread_count];
     for (int i = 0; i < this->thread_count; ++i) {
         auto thread = (HANDLE) _beginthreadex(nullptr, 0, windows_worker, (void*) this, 0, nullptr);
@@ -92,6 +94,7 @@ void ThreadPull::run() {
     WaitForMultipleObjects(this->thread_count, threads, true, INFINITE);
 #else
     cout << SYS_MSG << "Launching POSIX threads..." << endl;
+    cout << SYS_MSG << "Process: 0%";
     pthread_t threads[this->thread_count];
     pthread_attr_t attrs[this->thread_count];
 
@@ -105,10 +108,10 @@ void ThreadPull::run() {
     }
 #endif
 
-    printf("\rProgress: %i%%\n", (int) progress);
+    printf("\r%sProgress: %i%%\n", SYS_MSG.c_str(), (int) progress);
     abp.finalize();
 
     time(&end);
     double elapsed = difftime(end, start);
-    cout << SYS_MSG << "Elapsed time: " << elapsed / 60 << " minutes" << endl;
+    cout << SYS_MSG << "Elapsed time: " << setprecision(2) << elapsed / 60 << " minutes" << endl;
 }

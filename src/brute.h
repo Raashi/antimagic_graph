@@ -11,10 +11,13 @@
 using namespace std;
 
 
+const string SEPARATOR = "-----------------------";
+
 struct AntimagicBruteParams {
     atomic_long checked{0};
     atomic_long antimagic{0};
     atomic_long antimagic_randomized{0};
+    atomic_uint64_t antimagic_randomized_iterations{0};
     atomic_long not_antimagic{0};
     atomic_long not_antimagic_not_optimized{0};
 
