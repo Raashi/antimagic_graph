@@ -36,7 +36,7 @@ struct Graph {
         bool antimagic;
         bool optimized;
         bool randomized;
-        uint iterations;
+        ulong iterations;
     };
 
     int n;

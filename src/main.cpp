@@ -1,5 +1,11 @@
 #include <exception>
+
+#ifdef _WIN32
 #include <io.h>
+#else
+#include <sys/file.h>
+#include <zconf.h>
+#endif
 
 #include "threads.h"
 

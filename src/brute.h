@@ -11,7 +11,7 @@
 using namespace std;
 
 
-const string SEPARATOR = "-----------------------";
+const char SEPARATOR[] = "-----------------------";
 
 struct AntimagicBruteParams {
     atomic_long checked{0};
