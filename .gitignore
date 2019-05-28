@@ -1,19 +1,11 @@
 # Project files
 .idea/
 cmake-build-debug/
-n*.txt
 geng*
 antimagic*
 test/
 libgcc_s_seh-1.dll
 libstdc++-6.dll
-skipped.txt
-g.docx
-~$g.docx
-not_antimagic.txt
-
-# Python
-venv
 
 # Mac OS files
 .DS_Store
